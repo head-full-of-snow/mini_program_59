@@ -61,12 +61,15 @@
   <view class="data-section">
     <text class="label">智能体回复:</text>
     <view class="ai-reply-wrapper">
-      <view class="thinking-container" bindtap="changeisexpanded">
-        <view class="thinking-content" wx:if="false">
+      <view class="thinking-container" >
+        
+        <text class="thinking-content" wx:if="{{isexpanded}}">{{receivedData}}
+        </text>
+        <text bindtap="changeisexpanded" wx:if="{{isexpanded}}">
+        👉点击折叠思考过程</text>
+        <view class="thinking-content" bindtap="changeisexpanded" wx:if="{{!isexpanded}}">
           <text>👉 点击展开思考过程</text>
         </view>
-        <text class="thinking-content" wx:if="isexpanded">{{receivedData}}
-        </text>
       </view>
 
       <view class="data-container">
