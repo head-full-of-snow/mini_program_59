@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/GEO",
+    "pages/1",
+    "pages/GEO/GEO"
+  ],
+  "window": {
+    "navigationBarTitleText": "简单示例",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

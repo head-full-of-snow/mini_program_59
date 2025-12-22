@@ -1,0 +1,78 @@
+<!--pages/GEO/GEO.wxml-->
+<view class="container">
+  <!-- 连接状态 -->
+  <view class="status-section">
+    <text class="status-label">连接状态:</text>
+    <text class="status-value {{isConnected ? 'connected' : 'disconnected'}}">
+      {{isConnected ? '已连接' : '未连接'}}
+    </text>
+  </view>
+  
+  <!-- 工作流 -->
+  <view class="input-section">
+    <text class="label">工作流:</text>
+    <input 
+      class="input" 
+      placeholder="工作流ID" 
+      value="{{workflow_id}}" 
+      bindinput="onIDChange"
+    />
+  </view>
+  
+  <!-- 控制按钮 -->
+  <view class="button-section">
+    <button class="btn connect-btn" bindtap="connectWebSocket" type="primary" hidden>
+      连接
+    </button>
+    <button class="btn disconnect-btn" bindtap="disconnectWebSocket" hidden>
+      断开
+    </button>
+    <button class="btn clear-btn" bindtap="clearLog">
+      清空日志
+    </button>
+  </view>
+  
+  <!-- 消息发送 -->
+  <view class="input-section">
+    <text class="label">发送消息:</text>
+    <input 
+      class="input" 
+      placeholder="输入查询内容" 
+      value="{{message}}" 
+      bindinput="onMessageChange"
+    />
+    <button class="send-btn" bindtap="sendMessage" size="mini">
+      发送
+    </button>
+  </view>
+  
+  <!-- 日志显示 -->
+  <view class="log-section" hidden>
+    <text class="label">通信日志:</text>
+    <scroll-view class="log-container" scroll-y>
+      <view class="log-item {{item.type}}" wx:for="{{logs}}" wx:key="index">
+        <text class="log-time">{{item.time}}</text>
+        <text class="log-content">{{item.content}}</text>
+      </view>
+    </scroll-view>
+  </view>
+  
+  <!-- 接收到的数据 -->
+  <view class="data-section">
+    <text class="label">智能体回复:</text>
+    <view class="ai-reply-wrapper">
+      <view class="thinking-container" bindtap="changeisexpanded">
+        <view class="thinking-content" wx:if="false">
+          <text>👉 点击展开思考过程</text>
+        </view>
+        <text class="thinking-content" wx:if="isexpanded">{{receivedData}}
+        </text>
+      </view>
+
+      <view class="data-container">
+        <text class="data-content">{{receivedData}}</text>
+      </view>
+    </view>
+
+  </view>
+</view>

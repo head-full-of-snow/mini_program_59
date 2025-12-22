@@ -1,0 +1,7 @@
+<view class="container">
+  <view class="result-box">
+    <text class="result-text">{{apiData}}</text>
+  </view>
+  <button type="primary" bindtap="fetchData">获取信息</button>
+  <button bindtap="goToAbout">跳转</button>
+</view>
