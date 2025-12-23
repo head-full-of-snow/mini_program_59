@@ -1,0 +1,193 @@
+
+/* pages/Agent/Agent.wxss */
+.container {
+  padding: 20rpx;
+  font-size: 28rpx;
+}
+
+.status-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+  padding: 20rpx;
+  background: #f5f5f5;
+  border-radius: 10rpx;
+}
+
+.status-label {
+  margin-right: 20rpx;
+  font-weight: bold;
+}
+
+.status-value {
+  padding: 5rpx 15rpx;
+  border-radius: 5rpx;
+}
+
+.connected {
+  background: #07c160;
+  color: white;
+}
+
+.disconnected {
+  background: #fa5151;
+  color: white;
+}
+
+.input-section {
+  margin-bottom: 30rpx;
+}
+
+.label {
+  display: block;
+  margin-bottom: 10rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.input {
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 15rpx;
+  font-size: 28rpx;
+}
+
+.button-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+
+.btn {
+  flex: 1;
+  margin: 0 10rpx;
+  border-radius: 8rpx;
+}
+
+.connect-btn {
+  background: #07c160;
+  color: white;
+}
+
+.disconnect-btn {
+  background: #fa5151;
+  color: white;
+}
+
+.clear-btn {
+  background: #10aeff;
+  color: white;
+}
+
+.send-btn {
+  margin-top: 15rpx;
+  background: #576b95;
+  color: white;
+}
+
+.log-section {
+  margin-bottom: 30rpx;
+}
+
+.log-container {
+  height: 300rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 15rpx;
+  margin-top: 10rpx;
+  background: #f9f9f9;
+}
+
+.log-item {
+  margin-bottom: 10rpx;
+  padding: 10rpx;
+  border-radius: 5rpx;
+}
+
+.log-item.send {
+  background: #e6f7ff;
+  border-left: 5rpx solid #1890ff;
+}
+
+.log-item.receive {
+  background: #f6ffed;
+  border-left: 5rpx solid #52c41a;
+}
+
+.log-item.error {
+  background: #fff2f0;
+  border-left: 5rpx solid #ff4d4f;
+}
+
+.log-item.info {
+  background: #fafafa;
+  border-left: 5rpx solid #d9d9d9;
+}
+
+.log-time {
+  color: #999;
+  font-size: 24rpx;
+  margin-right: 15rpx;
+}
+
+.log-content {
+  word-break: break-all;
+}
+
+.data-section {
+  margin-bottom: 30rpx;
+  margin: 20rpx 0; /* 与其他区域的间距 */
+  padding: 0 15rpx; /* 左右留白 */
+}
+
+.ai-reply-wrapper {
+  width: 100%;
+  border-radius: 12rpx; /* 整体圆角，避免直角割裂 */
+  border: 1px solid #e5e5e5; /* 统一外边框，强化整块感 */
+  overflow: hidden; /* 让内部子容器的圆角和外框对齐，不溢出 */
+  box-sizing: border-box;
+}
+
+.thinking-container {
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-top: 1rpx;
+  min-height: 70rpx;
+  background: #bfbfbf;
+}
+
+.thinking-content{
+  word-break: break-all;
+  line-height: 1.6;
+  color: #403f3f;
+  font-size: 28rpx;
+}
+.thinking-content::after {
+  content: '...';
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.data-container {
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-top: 10rpx;
+  min-height: 200rpx;
+  background: #fff;
+  /* 可选：加细微分隔线，衔接思考区但不割裂 */
+  border-top: 1px solid #e5e5e5;
+  
+ 
+}
+.data-content {
+  word-break: break-all;
+  line-height: 1.6;
+  background: #fcfcfc;
+  font-size: 28rpx;
+  display: block; /* 撑满容器 */
+}

@@ -2,9 +2,14 @@ Page({
   data: {
     apiData: '点击下方按钮获取数据'
   },
-  goToAbout() {
+  goToworkflow() {
     wx.navigateTo({
       url: '/pages/GEO/GEO'
+    })
+  },
+  goToagent() {
+    wx.navigateTo({
+      url: '/pages/Agent/Agent'
     })
   },
 

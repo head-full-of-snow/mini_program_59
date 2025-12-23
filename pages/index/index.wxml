@@ -3,5 +3,13 @@
     <text class="result-text">{{apiData}}</text>
   </view>
   <button type="primary" bindtap="fetchData">获取信息</button>
-  <button bindtap="goToAbout">跳转</button>
+  <button bindtap="goToworkflow" class="button">
+    <image src="/images/猫律师.webp" mode="aspectFit"></image>
+    <text class="result-text">工作流</text>
+  </button>
+  <button bindtap="goToagent" class="button">
+    <image src="/images/猫律师.webp" mode="aspectFit">
+    </image>
+    智能体
+  </button>
 </view>
