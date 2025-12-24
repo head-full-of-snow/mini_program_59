@@ -63,7 +63,8 @@
     <view class="ai-reply-wrapper">
       <view class="thinking-container" >
         
-        <text class="thinking-content" wx:if="{{isexpanded}}">{{receivedData}}
+        <text class="thinking-content" wx:if="{{isexpanded}}">
+        {{thinkingdata}}
         </text>
         <text bindtap="changeisexpanded" wx:if="{{isexpanded}}">
         👉点击折叠思考过程</text>
@@ -73,7 +74,7 @@
       </view>
 
       <view class="data-container">
-        <text class="data-content">{{receivedData}}</text>
+        <text class="data-content">{{resultdata}}</text>
       </view>
     </view>
 

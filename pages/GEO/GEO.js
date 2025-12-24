@@ -16,6 +16,11 @@ Page({
     // 消息
     message: '你好',
     receivedData: '',
+    thinkingdata:'',
+    resultdata:'',
+    cotent_type:'',
+    THINKING_DELIMITER: "###thinking###:",
+    RESULT_DELIMITER: "###result###:",
 
     // 日志
     logs: [],
@@ -141,23 +146,70 @@ Page({
     socketTask.onMessage((res) => {
       try {
         const data = JSON.parse(res.data);
+        const { 
+          currentContentType, 
+          THINKING_DELIMITER: thinkingDelim, // 思考分界符
+          RESULT_DELIMITER: resultDelim,     // 结果分界符
+          thinkingdata,
+          resultdata
+        } = this.data;
 
         if (data.done) {
           this.addLog('receive', '[传输完成]');
-          this.setData({isexpanded: true})
+          this.setData({isexpanded: false});
           this.addLog('info', `共收到 ${data.total_chunks || '未知数量'} 个数据块`);
         } else if (data.error) {
           this.addLog('error', `错误: ${data.error}`);
         } else {
           // 显示接收到的内容
           const content = data.content || '';
+          if(content.includes('###thinking###:')){
+            this.setData({
+              cotent_type:"thinking"
+            });
+            const[before_content,after_content]=content.split(thinkingDelim)
+            this.setData({
+              thinkingdata:thinkingdata+after_content,
+              resultdata: resultdata+before_content
+            }
+            );
+            return;
+
+          }
+          if(content.includes('###result###:')){
+            this.setData({
+              cotent_type:"result"
+            });
+            const[before_content,after_content]=content.split(resultDelim)
+            this.setData({
+              thinkingdata:thinkingdata+before_content,
+              resultdata: resultdata+after_content
+            });
+            return;
+          }
+          
           this.addLog('receive', content);
 
           // 更新显示的数据
           this.setData({
             receivedData: this.data.receivedData + content
           });
+          if(this.data.cotent_type=="thinking"){
+            this.setData({
+              thinkingdata: this.data.thinkingdata + content
+            });
+          }
+          else if(this.data.cotent_type=="result"){
+            this.setData({
+              resultdata: this.data.resultdata + content
+            });
+          }
+          this.setData({
+            receivedData: this.data.receivedData + content
+          });
+
         }
+
       } catch (error) {
         this.addLog('receive', `原始数据: ${res.data}`);
       }
