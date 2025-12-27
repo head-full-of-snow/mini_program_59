@@ -191,3 +191,319 @@
   font-size: 28rpx;
   display: block; /* 撑满容器 */
 }
+
+
+/* pages/GEO/GEO.wxss */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.header {
+  background-color: #fff;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #e0e0e0;
+}
+
+.status-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-value {
+  padding: 5rpx 15rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+.connected {
+  background: #e8f9e6;
+  color: #07c160;
+}
+
+.disconnected {
+  background: #fde8e8;
+  color: #fa5151;
+}
+
+.workflow-id {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.messages-container {
+  flex: 1;
+  padding: 20rpx;
+  background-color: #f5f5f5;
+}
+
+.message-item {
+  display: flex;
+  margin-bottom: 30rpx;
+  min-height: 80rpx;
+}
+
+.user-message {
+  justify-content: flex-end;
+}
+
+.ai-message {
+  justify-content: flex-start;
+}
+
+.avatar {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: white;
+  flex-shrink: 0;
+  margin-top: 10rpx;
+}
+
+.user-avatar {
+  background-color: #07c160;
+  margin-left: 20rpx;
+}
+
+.ai-avatar {
+  background-color: #576b95;
+  margin-right: 20rpx;
+}
+
+.message-bubble {
+  max-width: 70%;
+  border-radius: 15rpx;
+  padding: 20rpx;
+  position: relative;
+  line-height: 1.5;
+}
+
+.user-bubble {
+  background-color: #dcf8c6;
+  border-bottom-right-radius: 5rpx;
+}
+
+.ai-bubble {
+  background-color: #fff;
+  border: 1rpx solid #e0e0e0;
+  border-bottom-left-radius: 5rpx;
+}
+
+.message-text {
+  font-size: 28rpx;
+  color: #333;
+  word-break: break-all;
+}
+
+.response-text {
+  font-size: 28rpx;
+  color: #333;
+  word-break: break-all;
+}
+
+.typing-indicator {
+  display: inline-block;
+  animation: blink 1s infinite;
+  color: #333;
+  margin-left: 8rpx;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.thinking-section {
+  margin-bottom: 15rpx;
+  padding: 15rpx;
+  background-color: #f0f0f0;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.thinking-toggle {
+  padding: 10rpx 0;
+  text-align: center;
+  cursor: pointer;
+}
+
+.toggle-text {
+  font-size: 24rpx;
+  color: #576b95;
+}
+
+.ai-response {
+  margin-top: 10rpx;
+}
+
+.input-area {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  background-color: #fff;
+  border-top: 1rpx solid #e0e0e0;
+}
+
+.chat-input {
+  flex: 1;
+  height: 80rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 40rpx;
+  padding: 0 30rpx;
+  font-size: 28rpx;
+  background-color: #f9f9f9;
+}
+
+.send-button {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 40rpx;
+  background-color: #576b95;
+  color: white;
+  font-size: 28rpx;
+  margin-left: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-button[disabled] {
+  background-color: #ccc;
+}
+
+.send-text {
+  font-size: 24rpx;
+}
+
+.log-item {
+  margin-bottom: 10rpx;
+  padding: 10rpx;
+  border-radius: 5rpx;
+}
+
+.log-item.send {
+  background: #e6f7ff;
+  border-left: 5rpx solid #1890ff;
+}
+
+.log-item.receive {
+  background: #f6ffed;
+  border-left: 5rpx solid #52c41a;
+}
+
+.log-item.error {
+  background: #fff2f0;
+  border-left: 5rpx solid #ff4d4f;
+}
+
+.log-item.info {
+  background: #fafafa;
+  border-left: 5rpx solid #d9d9d9;
+}
+
+.log-time {
+  color: #999;
+  font-size: 24rpx;
+  margin-right: 15rpx;
+}
+
+.log-content {
+  word-break: break-all;
+}
+
+.data-section {
+  margin-bottom: 30rpx;
+  margin: 20rpx 0; /* 与其他区域的间距 */
+  padding: 0 15rpx; /* 左右留白 */
+}
+
+.ai-reply-wrapper {
+  width: 100%;
+  border-radius: 12rpx; /* 整体圆角，避免直角割裂 */
+  border: 1px solid #e5e5e5; /* 统一外边框，强化整块感 */
+  overflow: hidden; /* 让内部子容器的圆角和外框对齐，不溢出 */
+  box-sizing: border-box;
+}
+
+.thinking-container {
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-top: 1rpx;
+  min-height: 70rpx;
+  background: #bfbfbf;
+}
+
+.thinking-content{
+  word-break: break-all;
+  line-height: 1.6;
+  color: #403f3f;
+  font-size: 28rpx;
+}
+.thinking-content::after {
+  content: '...';
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.data-container {
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-top: 10rpx;
+  min-height: 200rpx;
+  background: #fff;
+  /* 可选：加细微分隔线，衔接思考区但不割裂 */
+  border-top: 1px solid #e5e5e5;
+  
+ 
+}
+.data-content {
+  word-break: break-all;
+  line-height: 1.6;
+  background: #fcfcfc;
+  font-size: 28rpx;
+  display: block; /* 撑满容器 */
+}
+
+/* 选择器+输入框组合容器 */
+.input-picker-group {
+  display: flex;
+  align-items: center;
+  gap: 10rpx; /* 轮盘和输入框的间距 */
+  padding: 0 10rpx;
+}
+
+/* 滚动轮盘样式 */
+.workflow-picker {
+  flex: 1; /* 占1份宽度 */
+}
+.picker-text {
+  padding: 12rpx 16rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #333;
+  text-align: center;
+}
+
+/* 输入框样式（保留原有，调整宽度） */
+.chat-input {
+  flex: 2; /* 占2份宽度，比轮盘宽 */
+  padding: 12rpx 16rpx;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}

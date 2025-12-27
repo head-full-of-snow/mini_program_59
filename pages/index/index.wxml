@@ -1,15 +1,28 @@
-<view class="container">
+
+<view class="main-container">
+
+  <view class="welcome-section">
+    <text class="welcome-title">AI 助手</text>
+    <text class="welcome-desc">选择一个功能开始对话</text>
+  </view>
+  
   <view class="result-box">
     <text class="result-text">{{apiData}}</text>
   </view>
-  <button type="primary" bindtap="fetchData">获取信息</button>
-  <button bindtap="goToworkflow" class="button">
-    <image src="/images/猫律师.webp" mode="aspectFit"></image>
-    <text class="result-text">工作流</text>
-  </button>
-  <button bindtap="goToagent" class="button">
-    <image src="/images/猫律师.webp" mode="aspectFit">
-    </image>
-    智能体
-  </button>
+  
+  <view class="button-group">
+    <button type="primary" bindtap="fetchData" class="action-btn">获取信息</button>
+    <view class="card-container">
+      <view class="card-item" bindtap="goToworkflow">
+        <image src="/images/猫律师.webp" class="card-icon" mode="aspectFit"></image>
+        <text class="card-title">GEO 工作流</text>
+        <text class="card-desc">与GEO智能体对话</text>
+      </view>
+      <view class="card-item" bindtap="goToagent">
+        <image src="/images/猫律师.webp" class="card-icon" mode="aspectFit"></image>
+        <text class="card-title">智能体助手</text>
+        <text class="card-desc">与AI智能体对话</text>
+      </view>
+    </view>
+  </view>
 </view>

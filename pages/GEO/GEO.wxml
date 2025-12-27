@@ -1,24 +1,95 @@
 <!--pages/GEO/GEO.wxml-->
-<view class="container">
-  <!-- 连接状态 -->
-  <view class="status-section">
-    <text class="status-label">连接状态:</text>
-    <text class="status-value {{isConnected ? 'connected' : 'disconnected'}}">
-      {{isConnected ? '已连接' : '未连接'}}
-    </text>
+<view class="chat-container">
+  <!-- 顶部状态栏 -->
+  <view class="header">
+    <view class="status-section">
+      <text class="status-value {{isConnected ? 'connected' : 'disconnected'}}">
+        {{isConnected ? '🟢 已连接' : '🔴 未连接'}}
+      </text>
+    </view>
   </view>
   
-  <!-- 工作流 -->
-  <view class="input-section">
-    <text class="label">工作流:</text>
+<!-- 上下滚动轮盘：选择预设名字 -->
+  <view class="input-picker-group">
+    <!-- 上下滚动轮盘：选择预设名字 -->
+    <picker 
+      mode="selector" 
+      range="{{workflowNameList}}"   
+      value="{{selectedIndex}}" 
+      bindchange="onPickerChange"  
+      class="workflow-picker"
+    >
+      <view class="picker-text">
+        {{workflowList[selectedIndex].name }}
+      </view>
+    </picker>
+
+    <!-- 手动输入框：可输入ID/自定义内容，同步选中的轮盘ID -->
     <input 
-      class="input" 
-      placeholder="工作流ID" 
+      class="chat-input" 
+      placeholder="选择/输入ID" 
       value="{{workflow_id}}" 
-      bindinput="onIDChange"
+      bindinput="onIDChange"  
+      confirm-type="send"
+      bindconfirm="sendMessage"
     />
+
   </view>
+
+  <text class="workflow-id">工作流ID : {{workflow_id || '未设置'}}</text>
+    
+
   
+  
+  <!-- 聊天消息列表 -->
+  <scroll-view class="messages-container" scroll-y scroll-top="{{scrollTop}}" scroll-with-animation>
+    <view class="message-item {{item.type}}-message" wx:for="{{chatMessages}}" wx:key="id">
+      <view class="avatar {{item.type}}-avatar">{{item.type === 'user' ? '我' : 'AI'}}</view>
+      <view class="message-bubble {{item.type}}-bubble">
+        <view class="thinking-section" wx:if="{{item.type === 'ai' && item.history_isexpanded}}">
+          <text class="thinking-text">{{item.thinking_content}}</text>
+        </view>
+        <view class="thinking-toggle" bindtap="change_history_isexpanded" data-index="{{index}}" wx:if="{{item.type === 'ai'}}">
+          <text class="toggle-text">{{isexpanded ? '👆 收起思考过程' : '👇 展开思考过程'}}</text>
+        </view>
+        <view class="message-content">
+          <text class="message-text">{{item.result_content}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 当前正在接收的消息 -->
+    <view class="message-item ai-message" wx:if="{{receivedData && !isReceivingDone}}">
+      <view class="avatar ai-avatar">AI</view>
+      <view class="thinking-container" >
+        <text class="thinking-content" wx:if="{{isexpanded}}">
+        {{thinkingdata}}
+        </text>
+        <text bindtap="changeisexpanded" wx:if="{{isexpanded}}">
+        👉点击折叠思考过程</text>
+        <view class="thinking-content" bindtap="changeisexpanded" wx:if="{{!isexpanded}}">
+          <text>👉 点击展开思考过程</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+  
+  <!-- 输入区域 -->
+  <view class="input-area">
+    <input 
+      class="chat-input" 
+      placeholder="输入消息..." 
+      value="{{inputMessage}}" 
+      bindinput="onInputMessageChange"
+      confirm-type="send"
+      bindconfirm="sendMessage"
+    />
+    <button class="send-button" bindtap="sendMessage" disabled="{{!inputMessage || !isConnected}}">
+      <text class="send-text">发送</text>
+    </button>
+  </view>
+
+
   <!-- 控制按钮 -->
   <view class="button-section">
     <button class="btn connect-btn" bindtap="connectWebSocket" type="primary" hidden>
@@ -27,24 +98,11 @@
     <button class="btn disconnect-btn" bindtap="disconnectWebSocket" hidden>
       断开
     </button>
-    <button class="btn clear-btn" bindtap="clearLog">
+    <button class="btn clear-btn" bindtap="clearLog" hidden>
       清空日志
     </button>
   </view>
   
-  <!-- 消息发送 -->
-  <view class="input-section">
-    <text class="label">发送消息:</text>
-    <input 
-      class="input" 
-      placeholder="输入查询内容" 
-      value="{{message}}" 
-      bindinput="onMessageChange"
-    />
-    <button class="send-btn" bindtap="sendMessage" size="mini">
-      发送
-    </button>
-  </view>
   
   <!-- 日志显示 -->
   <view class="log-section" hidden>
@@ -56,27 +114,16 @@
       </view>
     </scroll-view>
   </view>
-  
-  <!-- 接收到的数据 -->
-  <view class="data-section">
-    <text class="label">智能体回复:</text>
-    <view class="ai-reply-wrapper">
-      <view class="thinking-container" >
-        
-        <text class="thinking-content" wx:if="{{isexpanded}}">
-        {{thinkingdata}}
-        </text>
-        <text bindtap="changeisexpanded" wx:if="{{isexpanded}}">
-        👉点击折叠思考过程</text>
-        <view class="thinking-content" bindtap="changeisexpanded" wx:if="{{!isexpanded}}">
-          <text>👉 点击展开思考过程</text>
-        </view>
-      </view>
 
-      <view class="data-container">
-        <text class="data-content">{{resultdata}}</text>
-      </view>
-    </view>
 
-  </view>
+
+
+
 </view>
+  
+
+
+  
+
+  
+  

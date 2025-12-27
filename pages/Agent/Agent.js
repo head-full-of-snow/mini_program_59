@@ -1,5 +1,6 @@
 // pages/Agent/Agent.js
 
+
 Page({
   data: {
     // 连接状态
@@ -9,13 +10,39 @@ Page({
     // 微信云托管
     // "wss://geo-mini-backend-prod-8g52b3gg19eac702-1314260299.ap-shanghai.run.wxcloudrun.com"
     //
-    workflow_id: '7552729187959636003',
-    // 7552729187959636003 测试工作流ID
+    // 1. 滚动轮盘的预设选项（自定义名字+对应ID，可根据需求扩展）
+    Agent_List: [
+      { name: "测试", id: "7537224044387713078" },
+      { name: "聊天", id: "7552806661178572863" },
+      { name: "风险评估", id: "7535656301062979594" },
+      { name: "北京化工大学小助手", id: "7588471857893244938" }
+    ],
+    Agent_Name_List: [], 
+    // 2. 选中的轮盘选项索引（默认选第一个）
+    selectedIndex: 0,
+    conversation_id:false,
+    user_id:"101",
+    agent_id: '7537224044387713078',
+    // 7537224044387713078 测试
     // 7566453172001554438 GEO先锋测试
 
     // 消息
     message: '你好',
+    inputMessage: '', // 新增：聊天输入框的消息
     receivedData: '',
+    receivedData: '',
+    thinkingdata: '',
+    resultdata: '',
+    cotent_type: '',
+    THINKING_DELIMITER: "###thinking###:",
+    RESULT_DELIMITER: "###result###:",
+
+
+    // 聊天消息列表
+    chatMessages: [], // 存储聊天记录
+
+    // 接收状态
+    isReceivingDone: false, // 标记是否已完成接收
 
     // 日志
     logs: [],
@@ -29,12 +56,21 @@ Page({
     // 重连相关
     reconnectTimer: null,
     reconnectCount: 0,
-    maxReconnectCount: 5
+    maxReconnectCount: 5,
+
+    // 滚动位置
+    scrollTop: 0
   },
 
   onLoad() {
     this.addLog('info', '页面加载完成');
     this.connectWebSocket();
+    const Agent_Name_List = this.data.Agent_List.map(item => item.name);
+    this.setData({
+      Agent_Name_List: Agent_Name_List,
+      // 初始化输入框为第一个工作流的 ID
+      agent_id: this.data.Agent_List[0].id
+    });
   },
 
   onUnload() {
@@ -48,12 +84,27 @@ Page({
     });
   },
 
+  // 新增：聊天输入框变化处理
+  onInputMessageChange(e) {
+    this.setData({
+      inputMessage: e.detail.value
+    });
+  },
+
   onMessageChange(e) {
     this.setData({
       message: e.detail.value
     });
   },
-
+  // 选择轮盘后的事件（原有逻辑保留）
+onPickerChange(e) {
+  const selectedIndex = e.detail.value;
+  const selectedItem = this.data.Agent_List[selectedIndex];
+  this.setData({
+    selectedIndex: selectedIndex,
+    workflow_id: selectedItem.id
+  });
+},
   // 添加日志
   addLog(type, content) {
     const time = this.formatTime(new Date());
@@ -80,7 +131,22 @@ Page({
   changeisexpanded() {
     this.setData({
       isexpanded: !this.data.isexpanded
-      });
+    });
+  },
+  change_history_isexpanded(e) {
+    const targetIndex = e.currentTarget.dataset.index;
+    // 复制原数组，避免直接修改
+    const newChatMessages = [...this.data.chatMessages];
+    // 修改对应索引的 item
+    newChatMessages[targetIndex] = {
+      ...newChatMessages[targetIndex],
+      history_isexpanded: !newChatMessages[targetIndex].history_isexpanded
+    };
+    // 更新数组
+    this.setData({ chatMessages: newChatMessages });
+    this.setData({
+      isexpanded: !this.data.isexpanded
+    });
   },
 
   // 连接WebSocket
@@ -141,21 +207,92 @@ Page({
     socketTask.onMessage((res) => {
       try {
         const data = JSON.parse(res.data);
-
+        const {
+          currentContentType,
+          THINKING_DELIMITER: thinkingDelim, // 思考分界符
+          RESULT_DELIMITER: resultDelim,     // 结果分界符
+          thinkingdata,
+          resultdata
+        } = this.data;
         if (data.done) {
           this.addLog('receive', '[传输完成]');
-          this.setData({isexpanded: true})
+          const conversation_id=data.content.conversation_id
+
+          // 添加AI回复到聊天记录
+          if (this.data.receivedData) {
+            const aiMessage = {
+              id: Date.now(),
+              type: 'ai',
+              content: this.data.receivedData,
+              thinking_content: this.data.thinkingdata,
+              result_content: this.data.resultdata,
+              timestamp: new Date().toLocaleTimeString(),
+              history_isexpanded: false
+            };
+
+            this.setData({
+              chatMessages: [...this.data.chatMessages, aiMessage],
+              isexpanded: false,
+              isReceivingDone: true,
+              conversation_id: conversation_id,
+              receivedData: '',
+              thinkingdata: '',
+              resultdata: '' // 清空临时接收数据
+            });
+          }
+
           this.addLog('info', `共收到 ${data.total_chunks || '未知数量'} 个数据块`);
         } else if (data.error) {
           this.addLog('error', `错误: ${data.error}`);
         } else {
           // 显示接收到的内容
           const content = data.content || '';
+          if (content.includes('###thinking###:')) {
+            this.setData({
+              cotent_type: "thinking",
+              isexpanded: true
+            });
+            const [before_content, after_content] = content.split(thinkingDelim)
+            this.setData({
+              thinkingdata: thinkingdata + after_content,
+              resultdata: resultdata + before_content
+            }
+            );
+            return;
+
+          }
+          if (content.includes('###result###:')) {
+            this.setData({
+              cotent_type: "result",
+              isexpanded: false
+            });
+            const [before_content, after_content] = content.split(resultDelim)
+            this.setData({
+              thinkingdata: thinkingdata + before_content,
+              resultdata: resultdata + after_content
+            });
+            return;
+          }
           this.addLog('receive', content);
 
           // 更新显示的数据
           this.setData({
             receivedData: this.data.receivedData + content
+          });
+          if (this.data.cotent_type == "thinking") {
+            this.setData({
+              thinkingdata: this.data.thinkingdata + content
+            });
+          }
+          else if (this.data.cotent_type == "result") {
+            this.setData({
+              resultdata: this.data.resultdata + content
+            });
+          }
+
+          this.setData({
+            receivedData: this.data.receivedData + content,
+            isReceivingDone: false
           });
         }
       } catch (error) {
@@ -195,7 +332,8 @@ Page({
       return;
     }
 
-    const message = this.data.message.trim();
+    // 使用新的输入框内容，如果为空则使用旧的消息字段
+    const message = this.data.inputMessage.trim() || this.data.message.trim();
     if (!message) {
       wx.showToast({
         title: '消息不能为空',
@@ -203,18 +341,34 @@ Page({
       });
       return;
     }
-    const workflow_ID =this.data.workflow_id.trim();
+
+    const agent_ID = this.data.agent_id.trim();
     const data = {
       task: message,
-      workflow_id: workflow_ID
+      agent_id: agent_ID,
+      conversation_id:this.data.conversation_id,
+      user_id:this.data.user_id
     };
 
     try {
+      // 添加用户消息到聊天记录
+      const userMessage = {
+        id: Date.now(),
+        type: 'user',
+        result_content: message,
+        timestamp: new Date().toLocaleTimeString()
+      };
+
+      this.setData({
+        chatMessages: [...this.data.chatMessages, userMessage],
+        inputMessage: '', // 清空输入框
+        receivedData: '' // 清空之前的数据
+      });
+
       this.data.socketTask.send({
         data: JSON.stringify(data),
         success: () => {
           this.addLog('send', message);
-          this.setData({ receivedData: '' }); // 清空之前的数据
         },
         fail: (err) => {
           this.addLog('error', `发送失败: ${err.errMsg}`);
