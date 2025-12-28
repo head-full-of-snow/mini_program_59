@@ -30,7 +30,7 @@ Page({
     message: '你好',
     inputMessage: '', // 新增：聊天输入框的消息
     receivedData: '',
-    receivedData: '',
+    // receivedData: '',
     thinkingdata: '',
     resultdata: '',
     cotent_type: '',
@@ -97,14 +97,14 @@ Page({
     });
   },
   // 选择轮盘后的事件（原有逻辑保留）
-onPickerChange(e) {
-  const selectedIndex = e.detail.value;
-  const selectedItem = this.data.Agent_List[selectedIndex];
-  this.setData({
-    selectedIndex: selectedIndex,
-    workflow_id: selectedItem.id
-  });
-},
+  onPickerChange(e) {
+    const selectedIndex = e.detail.value;
+    const selectedItem = this.data.Agent_List[selectedIndex];
+    this.setData({
+      selectedIndex: selectedIndex,
+      agent_id: selectedItem.id
+    });
+  },
   // 添加日志
   addLog(type, content) {
     const time = this.formatTime(new Date());
@@ -276,9 +276,6 @@ onPickerChange(e) {
           this.addLog('receive', content);
 
           // 更新显示的数据
-          this.setData({
-            receivedData: this.data.receivedData + content
-          });
           if (this.data.cotent_type == "thinking") {
             this.setData({
               thinkingdata: this.data.thinkingdata + content
@@ -296,7 +293,8 @@ onPickerChange(e) {
           });
         }
       } catch (error) {
-        this.addLog('receive', `原始数据: ${res.data}`);
+        const errorMsg = `错误类型：${error.name || '未知错误'}\n错误描述：${error.message}\n调用栈：${error.stack || '无'}`;
+        this.addLog('receive', `原始数据: ${res.data} 错误信息：${errorMsg}`);
       }
     });
 

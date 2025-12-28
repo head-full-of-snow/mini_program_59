@@ -70,6 +70,10 @@
         <view class="thinking-content" bindtap="changeisexpanded" wx:if="{{!isexpanded}}">
           <text>👉 点击展开思考过程</text>
         </view>
+        <view class="message-content">
+          <text class="message-text">{{item.result_content}}</text>
+        </view>
+
       </view>
     </view>
   </scroll-view>

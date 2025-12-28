@@ -37,7 +37,8 @@
 
   </view>
 
-  <text class="workflow-id">智能体ID : {{agent_id || '未设置'}}</text>
+  <text class="workflow-id">智能体ID : {{agent_id || '未设置'}}
+    会话ID : {{conversation_id || '未设置'}}</text>
     
 
   
@@ -55,7 +56,8 @@
           <text class="toggle-text">{{isexpanded ? '👆 收起思考过程' : '👇 展开思考过程'}}</text>
         </view>
         <view class="message-content">
-          <text class="message-text">{{item.content}}{{item.result_content}}</text>
+          <text class="message-text">{{item.content}}</text>
+          <text class="message-text" wx:if="{{item.type==='user'}}">{{item.result_content}}</text>
         </view>
       </view>
     </view>
@@ -73,6 +75,10 @@
           <text>👉 点击展开思考过程</text>
         </view>
       </view>
+      <view class="message-content">
+        <text class="message-text">{{receivedData}}</text>
+      </view>
+      
     </view>
   </scroll-view>
   
