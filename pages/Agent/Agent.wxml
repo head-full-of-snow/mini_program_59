@@ -7,6 +7,7 @@
       <text class="status-value {{isConnected ? 'connected' : 'disconnected'}}">
         {{isConnected ? '🟢 已连接' : '🔴 未连接'}}
       </text>
+      <text class="welcome-title">智能体</text>
     </view>
   </view>
   
@@ -53,12 +54,12 @@
           <text class="thinking-text">{{item.thinking_content}}</text>
         </view>
         <view class="thinking-toggle" bindtap="change_history_isexpanded" data-index="{{index}}" wx:if="{{item.type === 'ai'}}">
-          <text class="toggle-text">{{isexpanded ? '👆 收起思考过程' : '👇 展开思考过程'}}</text>
+          <text class="toggle-text">{{item.history_isexpanded ? '👆 收起思考过程' : '👇 展开思考过程'}}</text>
         </view>
-        <view class="message-content">
-          <text class="message-text">{{item.content}}</text>
-          <text class="message-text" wx:if="{{item.type==='user'}}">{{item.result_content}}</text>
-        </view>
+        <!-- <view class="message-content"> -->
+        <text class="message-text">{{item.result_content}}</text>
+        
+        <!-- </view> -->
       </view>
     </view>
     
@@ -66,6 +67,7 @@
     <view class="message-item ai-message" wx:if="{{receivedData && !isReceivingDone}}">
       <view class="avatar ai-avatar">AI</view>
       <view class="thinking-container" >
+      <!-- <view class="message-bubble ai-bubble">  -->
         <text class="thinking-content" wx:if="{{isexpanded}}">
         {{thinkingdata}}
         </text>
@@ -75,11 +77,11 @@
           <text>👉 点击展开思考过程</text>
         </view>
       </view>
-      <view class="message-content">
-        <text class="message-text">{{receivedData}}</text>
+      <view class="message-bubble ai-bubble"> 
+        <text class="message-text">{{resultdata}}</text>
       </view>
-      
     </view>
+
   </scroll-view>
   
   <!-- 输入区域 -->
@@ -113,7 +115,7 @@
   
   
   <!-- 日志显示 -->
-  <view class="log-section">
+  <view class="log-section" hidden>
     <text class="label">通信日志:</text>
     <scroll-view class="log-container" scroll-y>
       <view class="log-item {{item.type}}" wx:for="{{logs}}" wx:key="index">

@@ -5,10 +5,11 @@
     "pages/Agent/Agent"
   ],
   "window": {
-    "navigationBarTitleText": "简单示例",
+    "navigationBarTitleText": "传智杯AI微信小程序-南海59号",
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black"
   },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
 }

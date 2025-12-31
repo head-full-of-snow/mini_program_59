@@ -150,14 +150,14 @@
   box-sizing: border-box;
 }
 
-.thinking-container {
+/* .thinking-container {
   border: 1rpx solid #ddd;
   border-radius: 8rpx;
   padding: 20rpx;
   margin-top: 1rpx;
   min-height: 70rpx;
   background: #bfbfbf;
-}
+} */
 
 .thinking-content{
   word-break: break-all;
@@ -237,6 +237,7 @@
 }
 
 .messages-container {
+  /* max-width: 70%; */
   flex: 1;
   padding: 20rpx;
   background-color: #f5f5f5;
@@ -253,6 +254,7 @@
 }
 
 .ai-message {
+  flex-direction: column;/* AI消息垂直布局（头像+思考+结果） */
   justify-content: flex-start;
 }
 
@@ -436,6 +438,7 @@
 }
 
 .thinking-container {
+  max-width: 70%;
   border: 1rpx solid #ddd;
   border-radius: 8rpx;
   padding: 20rpx;
@@ -508,4 +511,12 @@
   border: 1px solid #eee;
   border-radius: 8rpx;
   font-size: 28rpx;
+}
+
+.welcome-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #2c405a;
+  margin-bottom: 20rpx;
 }

@@ -251,6 +251,7 @@
 }
 
 .ai-message {
+  flex-direction: column;/* AI消息垂直布局（头像+思考+结果） */
   justify-content: flex-start;
 }
 
@@ -506,4 +507,12 @@
   border: 1px solid #eee;
   border-radius: 8rpx;
   font-size: 28rpx;
+}
+
+.welcome-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #2c405a;
+  margin-bottom: 20rpx;
 }

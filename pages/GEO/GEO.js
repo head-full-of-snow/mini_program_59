@@ -13,8 +13,8 @@ Page({
     workflowList: [
       { name: "GEO", id: "7566453172001554438" },
       { name: "测试", id: "7552729187959636003" },
-      { name: "工作流3", id: "wf_003" },
-      { name: "工作流4", id: "wf_004" }
+      { name: "风险评估", id: "7589488104442462249" },
+      { name: "娱乐游戏", id: "7589529923770056756" }
     ],
     workflowNameList: [], 
     // 2. 选中的轮盘选项索引（默认选第一个）
@@ -26,7 +26,6 @@ Page({
     // 消息
     message: '你好',
     inputMessage: '', // 新增：聊天输入框的消息
-    receivedData: '',
     receivedData: '',
     thinkingdata: '',
     resultdata: '',

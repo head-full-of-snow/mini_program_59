@@ -6,6 +6,7 @@
       <text class="status-value {{isConnected ? 'connected' : 'disconnected'}}">
         {{isConnected ? '🟢 已连接' : '🔴 未连接'}}
       </text>
+      <text class="welcome-title">工作流</text>
     </view>
   </view>
   
@@ -50,7 +51,7 @@
           <text class="thinking-text">{{item.thinking_content}}</text>
         </view>
         <view class="thinking-toggle" bindtap="change_history_isexpanded" data-index="{{index}}" wx:if="{{item.type === 'ai'}}">
-          <text class="toggle-text">{{isexpanded ? '👆 收起思考过程' : '👇 展开思考过程'}}</text>
+          <text class="toggle-text">{{item.history_isexpanded ? '👆 收起思考过程' : '👇 展开思考过程'}}</text>
         </view>
         <view class="message-content">
           <text class="message-text">{{item.result_content}}</text>
@@ -70,11 +71,12 @@
         <view class="thinking-content" bindtap="changeisexpanded" wx:if="{{!isexpanded}}">
           <text>👉 点击展开思考过程</text>
         </view>
-        <view class="message-content">
-          <text class="message-text">{{item.result_content}}</text>
-        </view>
-
       </view>
+      <view class="messages-container">
+        <text class="message-text">{{resultdata}}</text>
+      </view>
+
+      
     </view>
   </scroll-view>
   

@@ -1,4 +1,4 @@
-
+<!--pages/index/index.wxml-->
 <view class="main-container">
 
   <view class="welcome-section">
@@ -7,6 +7,7 @@
   </view>
   
   <view class="result-box">
+    <image src="/images/鳄鱼.webp" class="card-icon" mode="aspectFit"></image>
     <text class="result-text">{{apiData}}</text>
   </view>
   
@@ -19,7 +20,7 @@
         <text class="card-desc">与GEO智能体对话</text>
       </view>
       <view class="card-item" bindtap="goToagent">
-        <image src="/images/猫律师.webp" class="card-icon" mode="aspectFit"></image>
+        <image src="/images/狗律师.webp" class="card-icon" mode="aspectFit"></image>
         <text class="card-title">智能体助手</text>
         <text class="card-desc">与AI智能体对话</text>
       </view>
