@@ -6,7 +6,7 @@ Page({
     // 连接状态
     isConnected: false,
     isexpanded: true,
-    serverUrl: "",
+    serverUrl: "wss://geo-mini-backend-prod-8g52b3gg19eac702-1314260299.ap-shanghai.run.wxcloudrun.com",
     // 微信云托管
     // "wss://geo-mini-backend-prod-8g52b3gg19eac702-1314260299.ap-shanghai.run.wxcloudrun.com"
     //
@@ -65,10 +65,6 @@ Page({
 
   onLoad() {
     this.addLog('info', '页面加载完成');
-    const websocket_url =getApp().globalData.websocket_url;
-    this.setData({
-      serverUrl :websocket_url
-    });
     this.connectWebSocket();
     const Agent_Name_List = this.data.Agent_List.map(item => item.name);
     this.setData({
@@ -184,12 +180,25 @@ Page({
     // 监听WebSocket事件
     this.listenWebSocketEvents();
   },
-
+  chat_agent(e){
+    wx.cloud.callContainer({
+      "config": {
+        "env": "prod-8g52b3gg19eac702"
+      },
+      "path": "/api/chat/stream",
+      "header": {
+        "X-WX-SERVICE": "geo-mini-backend",
+        "content-type": "application/json"
+      },
+      "method": "POST",
+      "data": e.data
+    })
+  },
   // 监听WebSocket事件
   listenWebSocketEvents() {
     const socketTask = this.data.socketTask;
     if (!socketTask) return;
-
+ 
     // 监听连接打开
     socketTask.onOpen(() => {
       this.addLog('info', 'WebSocket连接已打开');
@@ -367,8 +376,8 @@ Page({
         inputMessage: '', // 清空输入框
         receivedData: '' // 清空之前的数据
       });
-
-      this.data.socketTask.send({
+      
+      this.data.chat_agent({
         data: JSON.stringify(data),
         success: () => {
           this.addLog('send', message);

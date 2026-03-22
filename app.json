@@ -3,6 +3,7 @@
     "pages/index/index",
     "pages/GEO/GEO",
     "pages/Agent/Agent"
+    
   ],
   "window": {
     "navigationBarTitleText": "传智杯AI微信小程序-南海59号",

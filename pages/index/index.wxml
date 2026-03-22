@@ -6,13 +6,13 @@
     <text class="welcome-desc">选择一个功能开始对话</text>
   </view>
   
-  <view class="result-box">
+  <view class="result-box" bindtap="">
     <image src="/images/鳄鱼.webp" class="card-icon" mode="aspectFit"></image>
-    <text class="result-text">{{apiData}}</text>
+    <!-- <text class="result-text">{{apiData}}</text> -->
   </view>
   
   <view class="button-group">
-    <button type="primary" bindtap="fetchData" class="action-btn">获取信息</button>
+    <!-- <button type="primary" bindtap="fetchData" class="action-btn">获取信息</button> -->
     <view class="card-container">
       <view class="card-item" bindtap="goToworkflow">
         <image src="/images/猫律师.webp" class="card-icon" mode="aspectFit"></image>

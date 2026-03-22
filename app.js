@@ -34,6 +34,7 @@ App({
     })
   },
   globalData: {
-    userInfo: null
+    userInfo: null,
+    websocket_url:"wss://django-dsc6-prod-8g52b3gg19eac702-1314260299.ap-shanghai.run.wxcloudrun.com"
   }
 })

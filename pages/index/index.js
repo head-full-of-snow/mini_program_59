@@ -1,6 +1,15 @@
 Page({
   data: {
-    apiData: '点击下方按钮获取数据'
+    apiData: '点击下方按钮获取数据',
+    logs: [],
+  },
+  onLoad() {
+    this.addLog('info', '页面加载完成');
+    const websocket_url =getApp().globalData.websocket_url;
+    this.setData({
+      serverUrl :websocket_url
+    });
+    this.connectWebSocket();
   },
   goToworkflow() {
     wx.navigateTo({
@@ -10,6 +19,11 @@ Page({
   goToagent() {
     wx.navigateTo({
       url: '/pages/Agent/Agent'
+    })
+  },
+  goToagent_cloud() {
+    wx.navigateTo({
+      url: '/pages/Agent_cloud/Agent_cloud'
     })
   },
 
@@ -58,7 +72,59 @@ Page({
         wx.hideLoading();
       }
     });
-  }
+  },
+  // 连接WebSocket
+  connectWebSocket() {
+    if (this.data.isConnected) {
+      wx.showToast({
+        title: '已连接',
+        icon: 'none'
+      });
+      return;
+    }
+
+    const url = this.data.serverUrl;
+    this.addLog('info', `正在连接: ${url}`);
+
+    // 创建WebSocket连接
+    this.setData({
+      socketTask: wx.connectSocket({
+        url: url,
+        success: () => {
+          this.addLog('info', 'WebSocket连接创建成功');
+        },
+        fail: (err) => {
+          this.addLog('error', `连接失败: ${err.errMsg}`);
+          this.tryReconnect();
+        }
+      })
+    });
+
+    // 监听WebSocket事件
+    // this.listenWebSocketEvents();
+  },
+  // 添加日志
+  addLog(type, content) {
+    const time = this.formatTime(new Date());
+    const log = {
+      type: type,
+      time: time,
+      content: content
+    };
+
+    this.setData({
+      logs: [log, ...this.data.logs].slice(0, 100) // 限制日志数量
+    });
+  },
+  // 格式化时间
+  formatTime(date) {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  },
+
 })
+    
 
 

@@ -5,7 +5,7 @@ Page({
     // 连接状态
     isConnected: false,
     isexpanded: true,
-    serverUrl: "wss://geo-mini-backend-prod-8g52b3gg19eac702-1314260299.ap-shanghai.run.wxcloudrun.com",
+    serverUrl: "",
     // 微信云托管
     // "wss://geo-mini-backend-prod-8g52b3gg19eac702-1314260299.ap-shanghai.run.wxcloudrun.com"
     
@@ -60,6 +60,10 @@ Page({
 
   onLoad() {
     this.addLog('info', '页面加载完成');
+    const websocket_url =getApp().globalData.websocket_url;
+    this.setData({
+      serverUrl :websocket_url
+    });
     this.connectWebSocket();
     const workflowNameList = this.data.workflowList.map(item => item.name);
     this.setData({
