@@ -1,0 +1,139 @@
+<!--pages/Agent/Agent.wxml-->
+
+<view class="chat-container">
+  <!-- 顶部状态栏 -->
+  <view class="header">
+    <view class="status-section">
+      <text class="status-value {{isConnected ? 'connected' : 'disconnected'}}">
+        {{isConnected ? '🟢 已连接' : '🔴 未连接'}}
+      </text>
+      <text class="welcome-title">智能体</text>
+    </view>
+  </view>
+  
+<!-- 上下滚动轮盘：选择预设名字 -->
+  <view class="input-picker-group">
+    <!-- 上下滚动轮盘：选择预设名字 -->
+    <picker 
+      mode="selector" 
+      range="{{Agent_Name_List}}"   
+      value="{{selectedIndex}}" 
+      bindchange="onPickerChange"  
+      class="workflow-picker"
+    >
+      <view class="picker-text">
+        {{Agent_List[selectedIndex].name }}
+      </view>
+    </picker>
+
+    <!-- 手动输入框：可输入ID/自定义内容，同步选中的轮盘ID -->
+    <input 
+      class="chat-input" 
+      placeholder="选择/输入ID" 
+      value="{{agent_id}}" 
+      bindinput="onIDChange"  
+      confirm-type="send"
+      bindconfirm="sendMessage"
+    />
+
+  </view>
+
+  <text class="workflow-id">智能体ID : {{agent_id || '未设置'}}
+    会话ID : {{conversation_id || '未设置'}}</text>
+    
+
+  
+  
+  
+  <!-- 聊天消息列表 -->
+  <scroll-view class="messages-container" scroll-y scroll-top="{{scrollTop}}" scroll-with-animation>
+    <view class="message-item {{item.type}}-message" wx:for="{{chatMessages}}" wx:key="id">
+      <view class="avatar {{item.type}}-avatar">{{item.type === 'user' ? '我' : 'AI'}}</view>
+      <view class="message-bubble {{item.type}}-bubble">
+        <view class="thinking-section" wx:if="{{item.type === 'ai' && item.history_isexpanded}}">
+          <text class="thinking-text">{{item.thinking_content}}</text>
+        </view>
+        <view class="thinking-toggle" bindtap="change_history_isexpanded" data-index="{{index}}" wx:if="{{item.type === 'ai'}}">
+          <text class="toggle-text">{{item.history_isexpanded ? '👆 收起思考过程' : '👇 展开思考过程'}}</text>
+        </view>
+        <!-- <view class="message-content"> -->
+        <text class="message-text">{{item.result_content}}</text>
+        
+        <!-- </view> -->
+      </view>
+    </view>
+    
+    <!-- 当前正在接收的消息 -->
+    <view class="message-item ai-message" wx:if="{{receivedData && !isReceivingDone}}">
+      <view class="avatar ai-avatar">AI</view>
+      <view class="thinking-container" >
+      <!-- <view class="message-bubble ai-bubble">  -->
+        <text class="thinking-content" wx:if="{{isexpanded}}">
+        {{thinkingdata}}
+        </text>
+        <text bindtap="changeisexpanded" wx:if="{{isexpanded}}">
+        👉点击折叠思考过程</text>
+        <view class="thinking-content" bindtap="changeisexpanded" wx:if="{{!isexpanded}}">
+          <text>👉 点击展开思考过程</text>
+        </view>
+      </view>
+      <view class="message-bubble ai-bubble"> 
+        <text class="message-text">{{resultdata}}</text>
+      </view>
+    </view>
+
+  </scroll-view>
+  
+  <!-- 输入区域 -->
+  <view class="input-area">
+    <input 
+      class="chat-input" 
+      placeholder="输入消息..." 
+      value="{{inputMessage}}" 
+      bindinput="onInputMessageChange"
+      confirm-type="send"
+      bindconfirm="sendMessage"
+    />
+    <button class="send-button" bindtap="sendMessage" disabled="{{!inputMessage || !isConnected}}">
+      <text class="send-text">发送</text>
+    </button>
+  </view>
+
+
+  <!-- 控制按钮 -->
+  <view class="button-section">
+    <button class="btn connect-btn" bindtap="connectWebSocket" type="primary" hidden>
+      连接
+    </button>
+    <button class="btn disconnect-btn" bindtap="disconnectWebSocket" hidden>
+      断开
+    </button>
+    <button class="btn clear-btn" bindtap="clearLog" hidden>
+      清空日志
+    </button>
+  </view>
+  
+  
+  <!-- 日志显示 -->
+  <view class="log-section" hidden>
+    <text class="label">通信日志:</text>
+    <scroll-view class="log-container" scroll-y>
+      <view class="log-item {{item.type}}" wx:for="{{logs}}" wx:key="index">
+        <text class="log-time">{{item.time}}</text>
+        <text class="log-content">{{item.content}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
+
+
+
+
+</view>
+  
+
+
+  
+
+  
+  
