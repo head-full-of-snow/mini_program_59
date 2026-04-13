@@ -60,8 +60,28 @@ Page({
     maxReconnectCount: 5,
 
     // 滚动位置
-    scrollTop: 0
+    scrollTop: 0,
+
+    // 历史记录相关
+    showHistoryPanel: false,
+    chatHistory: [],
+
+    // 头像相关
+    currentAvatar: '',
+    avatarMapping: {},
+    showAvatarModal: false,
+    displayedAvatars: [],
+    hasMoreAvatars: false,
+    avatarPageSize: 5,
+    avatarCurrentPage: 1
   },
+
+  // 可选头像列表
+  avatarList: [
+    { name: '狗律师', path: '/images/狗律师.webp' },
+    { name: '猫律师', path: '/images/猫律师.webp' },
+    { name: '鳄鱼', path: '/images/鳄鱼.webp' }
+  ],
 
   onLoad() {
     this.addLog('info', '页面加载完成');
@@ -73,8 +93,271 @@ Page({
     const Agent_Name_List = this.data.Agent_List.map(item => item.name);
     this.setData({
       Agent_Name_List: Agent_Name_List,
-      // 初始化输入框为第一个工作流的 ID
       agent_id: this.data.Agent_List[0].id
+    });
+    this.loadChatHistory();
+    this.loadAvatarMapping();
+    this.updateCurrentAvatar();
+  },
+
+  // 加载头像映射
+  loadAvatarMapping() {
+    try {
+      const mapping = wx.getStorageSync('agentAvatarMapping') || {};
+      this.setData({ avatarMapping: mapping });
+    } catch (e) {
+      this.addLog('error', `加载头像映射失败: ${e.message}`);
+    }
+  },
+
+  // 保存头像映射
+  saveAvatarMapping() {
+    try {
+      wx.setStorageSync('agentAvatarMapping', this.data.avatarMapping);
+    } catch (e) {
+      this.addLog('error', `保存头像映射失败: ${e.message}`);
+    }
+  },
+
+  // 更新当前头像
+  updateCurrentAvatar() {
+    const agentId = this.data.agent_id;
+    const avatar = this.data.avatarMapping[agentId] || '';
+    this.setData({ currentAvatar: avatar });
+  },
+
+  // 选择头像
+  chooseAvatar() {
+    // 重置分页
+    this.setData({
+      avatarCurrentPage: 1,
+      avatarPageSize: 5
+    });
+    this.updateDisplayedAvatars();
+
+    // 显示弹窗
+    this.setData({
+      showAvatarModal: true
+    });
+  },
+
+  // 关闭头像选择弹窗
+  closeAvatarModal() {
+    this.setData({
+      showAvatarModal: false
+    });
+  },
+
+  // 更新显示的头像列表
+  updateDisplayedAvatars() {
+    const pageSize = this.data.avatarPageSize;
+    const currentPage = this.data.avatarCurrentPage;
+    const startIndex = 0;
+    const endIndex = currentPage * pageSize;
+
+    const displayed = this.avatarList.slice(startIndex, endIndex);
+    const hasMore = endIndex < this.avatarList.length;
+
+    this.setData({
+      displayedAvatars: displayed,
+      hasMoreAvatars: hasMore
+    });
+  },
+
+  // 显示更多头像
+  showMoreAvatars() {
+    this.setData({
+      avatarPageSize: 10,
+      avatarCurrentPage: 1
+    });
+    this.updateDisplayedAvatars();
+  },
+
+  // 选择头像
+  selectAvatar(e) {
+    const selectedPath = e.currentTarget.dataset.path;
+    const agentId = this.data.agent_id;
+
+    // 更新映射
+    const mapping = this.data.avatarMapping;
+    mapping[agentId] = selectedPath;
+
+    this.setData({
+      avatarMapping: mapping,
+      currentAvatar: selectedPath,
+      showAvatarModal: false
+    });
+
+    this.saveAvatarMapping();
+
+    wx.showToast({
+      title: '头像已更新',
+      icon: 'success'
+    });
+  },
+
+  // 从本地存储加载聊天历史
+  loadChatHistory() {
+    try {
+      const history = wx.getStorageSync('chatHistory');
+      if (history) {
+        this.setData({ chatHistory: history });
+      }
+    } catch (e) {
+      this.addLog('error', `加载历史记录失败: ${e.message}`);
+    }
+  },
+
+  // 保存聊天历史到本地存储（按会话ID分类）
+  saveChatHistory() {
+    try {
+      if (this.data.chatMessages.length === 0) return;
+
+      const conversationId = this.data.conversation_id || 'default';
+      const agentItem = this.data.Agent_List[this.data.selectedIndex] || { name: '未知', id: '' };
+
+      // 获取最后一条用户消息作为预览
+      let preview = '暂无内容';
+      for (let i = this.data.chatMessages.length - 1; i >= 0; i--) {
+        if (this.data.chatMessages[i].type === 'user') {
+          preview = this.data.chatMessages[i].result_content.substring(0, 50) + (this.data.chatMessages[i].result_content.length > 50 ? '...' : '');
+          break;
+        }
+      }
+
+      const historyItem = {
+        conversationId: conversationId,
+        agentName: agentItem.name,
+        agentId: this.data.agent_id,
+        preview: preview,
+        messages: this.data.chatMessages,
+        timestamp: new Date().getTime(), // 使用时间戳便于排序
+        timeString: new Date().toLocaleString()
+      };
+
+      let history = this.data.chatHistory || [];
+
+      // 查找是否已存在相同会话ID的记录
+      const existingIndex = history.findIndex(item => item.conversationId === conversationId);
+
+      if (existingIndex !== -1) {
+        // 更新现有会话
+        history[existingIndex] = historyItem;
+        // 将该会话移到数组最前面
+        history.splice(existingIndex, 1);
+        history.unshift(historyItem);
+      } else {
+        // 添加新会话到数组最前面
+        history.unshift(historyItem);
+      }
+
+      // 按时间戳排序（新的在前）
+      history.sort((a, b) => b.timestamp - a.timestamp);
+
+      // 限制历史记录数量
+      if (history.length > 50) {
+        history = history.slice(0, 50);
+      }
+
+      this.setData({ chatHistory: history });
+      wx.setStorageSync('chatHistory', history);
+      this.addLog('info', '聊天历史已保存');
+    } catch (e) {
+      this.addLog('error', `保存历史记录失败: ${e.message}`);
+    }
+  },
+
+  // 切换历史面板显示
+  toggleHistoryPanel() {
+    this.setData({
+      showHistoryPanel: !this.data.showHistoryPanel
+    });
+  },
+
+  // 加载选中的历史记录
+  loadHistory(e) {
+    const index = e.currentTarget.dataset.index;
+    const historyItem = this.data.chatHistory[index];
+    if (historyItem) {
+      this.setData({
+        chatMessages: historyItem.messages,
+        agent_id: historyItem.agentId,
+        conversation_id: historyItem.conversationId,
+        showHistoryPanel: false,
+        isReceivingDone: true
+      });
+      wx.showToast({
+        title: '已加载历史记录',
+        icon: 'success'
+      });
+    }
+  },
+
+  // 删除单条历史记录
+  deleteHistory(e) {
+    const index = e.currentTarget.dataset.index;
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除这条历史记录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          let history = this.data.chatHistory;
+          history.splice(index, 1);
+          this.setData({ chatHistory: history });
+          wx.setStorageSync('chatHistory', history);
+          wx.showToast({
+            title: '已删除',
+            icon: 'success'
+          });
+        }
+      }
+    });
+  },
+
+  // 清空当前聊天
+  clearChat() {
+    wx.showModal({
+      title: '确认清空',
+      content: '确定要清空当前聊天记录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          if (this.data.chatMessages.length > 0) {
+            this.saveChatHistory();
+          }
+          this.setData({
+            chatMessages: [],
+            receivedData: '',
+            thinkingdata: '',
+            resultdata: '',
+            isReceivingDone: true,
+            conversation_id: false
+          });
+          wx.showToast({
+            title: '已清空',
+            icon: 'success'
+          });
+        }
+      }
+    });
+  },
+
+  // 复制消息内容
+  copyMessage(e) {
+    const content = e.currentTarget.dataset.content;
+    wx.setClipboardData({
+      data: content,
+      success: () => {
+        wx.showToast({
+          title: '已复制',
+          icon: 'success'
+        });
+      },
+      fail: () => {
+        wx.showToast({
+          title: '复制失败',
+          icon: 'none'
+        });
+      }
     });
   },
 
@@ -109,6 +392,7 @@ Page({
       selectedIndex: selectedIndex,
       agent_id: selectedItem.id
     });
+    this.updateCurrentAvatar();
   },
   // 添加日志
   addLog(type, content) {
@@ -242,8 +526,9 @@ Page({
               conversation_id: conversation_id,
               receivedData: '',
               thinkingdata: '',
-              resultdata: '' // 清空临时接收数据
+              resultdata: ''
             });
+            this.saveChatHistory();
           }
 
           this.addLog('info', `共收到 ${data.total_chunks || '未知数量'} 个数据块`);

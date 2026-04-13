@@ -7,7 +7,79 @@
       <text class="status-value {{isConnected ? 'connected' : 'disconnected'}}">
         {{isConnected ? '🟢 已连接' : '🔴 未连接'}}
       </text>
-      <text class="welcome-title">智能体</text>
+      <view class="title-with-avatar">
+        <text class="welcome-title">智能体</text>
+        <view class="avatar-container-small" bindtap="chooseAvatar">
+          <image
+            class="agent-avatar-small {{currentAvatar ? '' : 'avatar-empty'}}"
+            src="{{currentAvatar || '/images/默认头像.png'}}"
+            mode="aspectFill"
+          ></image>
+          <view class="avatar-tip-small" wx:if="{{!currentAvatar}}">+</view>
+        </view>
+      </view>
+    </view>
+    <view class="header-actions">
+      <button class="action-btn history-btn" bindtap="toggleHistoryPanel">
+        <text>📜 历史</text>
+      </button>
+      <button class="action-btn clear-chat-btn" bindtap="clearChat" wx:if="{{chatMessages.length > 0}}">
+        <text>🗑️ 清空</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 头像选择弹窗 -->
+  <view class="avatar-modal {{showAvatarModal ? 'show' : ''}}" wx:if="{{showAvatarModal}}">
+    <view class="avatar-modal-mask" bindtap="closeAvatarModal"></view>
+    <view class="avatar-modal-content">
+      <view class="avatar-modal-header">
+        <text class="avatar-modal-title">选择头像</text>
+        <view class="avatar-modal-close" bindtap="closeAvatarModal">×</view>
+      </view>
+      <scroll-view class="avatar-modal-body" scroll-y>
+        <view class="avatar-grid">
+          <view
+            class="avatar-grid-item {{currentAvatar === item.path ? 'selected' : ''}}"
+            wx:for="{{displayedAvatars}}"
+            wx:key="path"
+            bindtap="selectAvatar"
+            data-path="{{item.path}}"
+          >
+            <image class="avatar-grid-image" src="{{item.path}}" mode="aspectFill"></image>
+            <view class="avatar-selected-icon" wx:if="{{currentAvatar === item.path}}">✓</view>
+          </view>
+        </view>
+        <view class="avatar-more-btn" bindtap="showMoreAvatars" wx:if="{{hasMoreAvatars}}">
+          <text>查看更多</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+  
+  <!-- 历史记录面板 -->
+  <view class="history-panel {{showHistoryPanel ? 'show' : ''}}" wx:if="{{showHistoryPanel}}">
+    <view class="history-panel-content" catchtap="stopPropagation">
+      <view class="history-header">
+        <text class="history-title">📜 聊天历史记录</text>
+        <button class="close-btn" bindtap="toggleHistoryPanel">×</button>
+      </view>
+      <scroll-view class="history-list" scroll-y>
+        <view class="history-empty" wx:if="{{chatHistory.length === 0}}">
+          <text>暂无历史记录</text>
+        </view>
+        <view class="history-item" wx:for="{{chatHistory}}" wx:key="conversationId" bindtap="loadHistory" data-index="{{index}}">
+          <view class="history-item-header">
+            <text class="history-agent">{{item.agentName}}</text>
+            <text class="history-conversation-id">会话ID: {{item.conversationId.substring(0, 8)}}...</text>
+          </view>
+          <text class="history-preview">{{item.preview}}</text>
+          <view class="history-item-footer">
+            <text class="history-time">{{item.timeString}}</text>
+            <view class="history-delete" catchtap="deleteHistory" data-index="{{index}}">🗑️ 删除</view>
+          </view>
+        </view>
+      </scroll-view>
     </view>
   </view>
   
@@ -47,19 +119,34 @@
   
   <!-- 聊天消息列表 -->
   <scroll-view class="messages-container" scroll-y scroll-top="{{scrollTop}}" scroll-with-animation>
+    <!-- Loading indicator -->
+    <view class="loading-indicator" wx:if="{{receivedData && !isReceivingDone}}">
+      <text class="loading-text">🤖 AI正在输入</text>
+      <view class="loading-dots">
+        <text class="dot">.</text>
+        <text class="dot">.</text>
+        <text class="dot">.</text>
+      </view>
+    </view>
+    
     <view class="message-item {{item.type}}-message" wx:for="{{chatMessages}}" wx:key="id">
       <view class="avatar {{item.type}}-avatar">{{item.type === 'user' ? '我' : 'AI'}}</view>
       <view class="message-bubble {{item.type}}-bubble">
+        <view class="bubble-header" wx:if="{{item.type === 'ai'}}">
+          <text class="bubble-time">{{item.timestamp}}</text>
+          <text class="copy-btn" bindtap="copyMessage" data-content="{{item.result_content}}">📋 复制</text>
+        </view>
         <view class="thinking-section" wx:if="{{item.type === 'ai' && item.history_isexpanded}}">
           <text class="thinking-text">{{item.thinking_content}}</text>
         </view>
         <view class="thinking-toggle" bindtap="change_history_isexpanded" data-index="{{index}}" wx:if="{{item.type === 'ai'}}">
           <text class="toggle-text">{{item.history_isexpanded ? '👆 收起思考过程' : '👇 展开思考过程'}}</text>
         </view>
-        <!-- <view class="message-content"> -->
         <text class="message-text">{{item.result_content}}</text>
-        
-        <!-- </view> -->
+        <view class="bubble-footer" wx:if="{{item.type === 'user'}}">
+          <text class="bubble-time">{{item.timestamp}}</text>
+          <text class="copy-btn" bindtap="copyMessage" data-content="{{item.result_content}}">📋 复制</text>
+        </view>
       </view>
     </view>
     
@@ -86,15 +173,15 @@
   
   <!-- 输入区域 -->
   <view class="input-area">
-    <input 
-      class="chat-input" 
-      placeholder="输入消息..." 
-      value="{{inputMessage}}" 
+    <textarea
+      class="chat-input textarea-input"
+      placeholder="输入消息..."
+      value="{{inputMessage}}"
       bindinput="onInputMessageChange"
-      confirm-type="send"
-      bindconfirm="sendMessage"
+      auto-height
+      maxlength="500"
     />
-    <button class="send-button" bindtap="sendMessage" disabled="{{!inputMessage || !isConnected}}">
+    <button class="send-button send-btn-short" bindtap="sendMessage" disabled="{{!inputMessage || !isConnected}}">
       <text class="send-text">发送</text>
     </button>
   </view>
