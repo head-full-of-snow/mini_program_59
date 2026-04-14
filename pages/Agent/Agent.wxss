@@ -26,16 +26,6 @@
   border-radius: 5rpx;
 }
 
-.connected {
-  background: #07c160;
-  color: white;
-}
-
-.disconnected {
-  background: #fa5151;
-  color: white;
-}
-
 .input-section {
   margin-bottom: 30rpx;
 }
@@ -220,13 +210,17 @@
   display: flex;
   align-items: center;
   gap: 20rpx;
+  position: relative;
+  width: 100%;
 }
 
 .avatar-container-small {
-  position: relative;
+  position: absolute;
+  left: 0;
   width: 80rpx;
   height: 80rpx;
   cursor: pointer;
+  z-index: 1;
 }
 
 .agent-avatar-small {
@@ -237,6 +231,17 @@
   box-shadow: 0 2rpx 8rpx rgba(87, 107, 149, 0.3);
   transition: all 0.3s ease;
   background-color: #f0f0f0;
+}
+
+.welcome-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #2c405a;
+  margin: 0 auto;
+  transition: color 0.3s ease;
+  text-align: center;
+  width: 100%;
 }
 
 .agent-avatar-small.avatar-empty {
@@ -469,16 +474,6 @@
   padding: 5rpx 15rpx;
   border-radius: 20rpx;
   font-size: 24rpx;
-}
-
-.connected {
-  background: #e8f9e6;
-  color: #07c160;
-}
-
-.disconnected {
-  background: #fde8e8;
-  color: #fa5151;
 }
 
 .workflow-id {
@@ -999,13 +994,27 @@
 .input-picker-group {
   display: flex;
   align-items: center;
-  gap: 10rpx; /* 轮盘和输入框的间距 */
+  justify-content: space-between;
   padding: 0 10rpx;
+  position: relative;
 }
 
 /* 滚动轮盘样式 */
 .workflow-picker {
-  flex: 1; /* 占1份宽度 */
+  flex: 0 0 auto;
+}
+
+/* 历史记录按钮（内联） */
+.history-btn-inline {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24rpx;
+  padding: 8rpx 20rpx;
+  background-color: #e8f4ff;
+  color: #576b95;
+  border-radius: 20rpx;
+  border: none;
 }
 .picker-text {
   padding: 12rpx 16rpx;
@@ -1014,7 +1023,177 @@
   font-size: 28rpx;
   color: #333;
   text-align: center;
+  border: 2rpx solid #576b95;
+  box-shadow: 0 2rpx 8rpx rgba(87, 107, 149, 0.3);
+  transition: all 0.3s ease;
 }
+
+.picker-text:active {
+  background: #e8f4ff;
+  transform: scale(0.98);
+}
+
+.picker-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10rpx;
+}
+
+.picker-name {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.picker-arrow {
+  font-size: 20rpx;
+  color: #576b95;
+}
+
+/* 自定义选择器弹窗 */
+.picker-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.picker-modal.show {
+  pointer-events: auto;
+}
+
+.picker-modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.picker-modal.show .picker-modal-mask {
+  opacity: 1;
+}
+
+.picker-modal-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border-radius: 20rpx 20rpx 0 0;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  max-height: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+.picker-modal.show .picker-modal-content {
+  transform: translateY(0);
+}
+
+.picker-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #e0e0e0;
+  background-color: #f8f8f8;
+  border-radius: 20rpx 20rpx 0 0;
+}
+
+.picker-modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.picker-modal-close {
+  width: 50rpx;
+  height: 50rpx;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  color: #666;
+  font-size: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.picker-modal-body {
+  flex: 1;
+  padding: 20rpx;
+  overflow-y: auto;
+}
+
+.picker-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx;
+  background-color: #f8f8f8;
+  border-radius: 12rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.picker-item.selected {
+  background-color: #e8f4ff;
+  border-color: #576b95;
+}
+
+.picker-item:active {
+  transform: scale(0.98);
+}
+
+.picker-item-name {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.picker-item-avatar {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  border: 2rpx solid #576b95;
+  margin-left: 20rpx;
+  object-fit: cover;
+}
+
+.picker-item-check {
+  position: absolute;
+  top: 10rpx;
+  right: 10rpx;
+  width: 36rpx;
+  height: 36rpx;
+  background-color: #576b95;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
 
 /* 输入框样式（保留原有，调整宽度） */
 .chat-input {
@@ -1026,10 +1205,6 @@
   font-size: 28rpx;
 }
 
-.welcome-title {
-  display: block;
-  font-size: 48rpx;
-  font-weight: bold;
-  color: #2c405a;
-  margin-bottom: 0;
+.welcome-title.disconnected {
+  color: #fa5151;
 }

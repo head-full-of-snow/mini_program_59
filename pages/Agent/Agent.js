@@ -73,7 +73,10 @@ Page({
     displayedAvatars: [],
     hasMoreAvatars: false,
     avatarPageSize: 10,
-    avatarCurrentPage: 1
+    avatarCurrentPage: 1,
+
+    // 选择器弹窗
+    showPickerModal: false
   },
 
   // 可选头像列表（从存储中动态加载）
@@ -576,6 +579,39 @@ Page({
       agent_id: selectedItem.id
     });
     this.updateCurrentAvatar();
+  },
+
+  // 显示智能体选择器
+  showAgentPicker() {
+    this.setData({
+      showPickerModal: true
+    });
+  },
+
+  // 隐藏智能体选择器
+  hidePickerModal() {
+    this.setData({
+      showPickerModal: false
+    });
+  },
+
+  // 选择智能体
+  selectAgent(e) {
+    const index = e.currentTarget.dataset.index;
+    const selectedItem = this.data.Agent_List[index];
+
+    this.setData({
+      selectedIndex: index,
+      agent_id: selectedItem.id,
+      showPickerModal: false
+    });
+
+    this.updateCurrentAvatar();
+
+    wx.showToast({
+      title: `已选择：${selectedItem.name}`,
+      icon: 'success'
+    });
   },
   // 添加日志
   addLog(type, content) {

@@ -70,7 +70,10 @@ Page({
     displayedAvatars: [],
     hasMoreAvatars: false,
     avatarPageSize: 10,
-    avatarCurrentPage: 1
+    avatarCurrentPage: 1,
+
+    // 选择器弹窗
+    showPickerModal: false
   },
 
   // 可选头像列表（从存储中动态加载）
@@ -409,6 +412,39 @@ Page({
       workflow_id: selectedItem.id
     });
     this.updateCurrentAvatar();
+  },
+
+  // 显示工作流选择器
+  showWorkflowPicker() {
+    this.setData({
+      showPickerModal: true
+    });
+  },
+
+  // 隐藏工作流选择器
+  hidePickerModal() {
+    this.setData({
+      showPickerModal: false
+    });
+  },
+
+  // 选择工作流
+  selectWorkflow(e) {
+    const index = e.currentTarget.dataset.index;
+    const selectedItem = this.data.workflowList[index];
+
+    this.setData({
+      selectedIndex: index,
+      workflow_id: selectedItem.id,
+      showPickerModal: false
+    });
+
+    this.updateCurrentAvatar();
+
+    wx.showToast({
+      title: `已选择：${selectedItem.name}`,
+      icon: 'success'
+    });
   },
 
 

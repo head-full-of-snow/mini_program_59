@@ -4,25 +4,19 @@
   <!-- 顶部状态栏 -->
   <view class="header">
     <view class="status-section">
-      <text class="status-value {{isConnected ? 'connected' : 'disconnected'}}">
-        {{isConnected ? '🟢 已连接' : '🔴 未连接'}}
-      </text>
       <view class="title-with-avatar">
-        <text class="welcome-title">智能体</text>
         <view class="avatar-container-small" bindtap="chooseAvatar">
           <image
             class="agent-avatar-small {{currentAvatar ? '' : 'avatar-empty'}}"
-            src="{{currentAvatar || '/images/默认头像.png'}}"
+            src="{{currentAvatar || ''}}"
             mode="aspectFill"
           ></image>
           <view class="avatar-tip-small" wx:if="{{!currentAvatar}}">+</view>
         </view>
+        <text class="welcome-title {{isConnected ? 'connected' : 'disconnected'}}">智能体</text>
       </view>
     </view>
     <view class="header-actions">
-      <button class="action-btn history-btn" bindtap="toggleHistoryPanel">
-        <text>📜 历史</text>
-      </button>
       <button class="action-btn clear-chat-btn" bindtap="clearChat" wx:if="{{chatMessages.length > 0}}">
         <text>🗑️ 清空</text>
       </button>
@@ -94,34 +88,56 @@
   
 <!-- 上下滚动轮盘：选择预设名字 -->
   <view class="input-picker-group">
-    <!-- 上下滚动轮盘：选择预设名字 -->
-    <picker 
-      mode="selector" 
-      range="{{Agent_Name_List}}"   
-      value="{{selectedIndex}}" 
-      bindchange="onPickerChange"  
-      class="workflow-picker"
-    >
+    <!-- 自定义选择器 -->
+    <view class="workflow-picker" bindtap="showAgentPicker">
       <view class="picker-text">
-        {{Agent_List[selectedIndex].name }}
+        <view class="picker-content">
+          <text class="picker-name">{{Agent_List[selectedIndex].name }}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
       </view>
-    </picker>
+    </view>
 
-    <!-- 手动输入框：可输入ID/自定义内容，同步选中的轮盘ID -->
-    <input 
-      class="chat-input" 
-      placeholder="选择/输入ID" 
-      value="{{agent_id}}" 
-      bindinput="onIDChange"  
-      confirm-type="send"
-      bindconfirm="sendMessage"
-    />
+    <!-- 历史记录按钮 -->
+    <button class="action-btn history-btn-inline" bindtap="toggleHistoryPanel">
+      <text>📜 历史</text>
+    </button>
+  </view>
 
+  <!-- 自定义选择器弹窗 -->
+  <view class="picker-modal {{showPickerModal ? 'show' : ''}}" wx:if="{{showPickerModal}}">
+    <view class="picker-modal-mask" bindtap="hidePickerModal"></view>
+    <view class="picker-modal-content">
+      <view class="picker-modal-header">
+        <text class="picker-modal-title">选择智能体</text>
+        <view class="picker-modal-close" bindtap="hidePickerModal">×</view>
+      </view>
+      <scroll-view class="picker-modal-body" scroll-y>
+        <view class="picker-item-list">
+          <view
+            class="picker-item {{selectedIndex === index ? 'selected' : ''}}"
+            wx:for="{{Agent_List}}"
+            wx:key="id"
+            bindtap="selectAgent"
+            data-index="{{index}}"
+          >
+            <text class="picker-item-name">{{item.name}}</text>
+            <image
+              class="picker-item-avatar"
+              wx:if="{{avatarMapping[item.id]}}"
+              src="{{avatarMapping[item.id]}}"
+              mode="aspectFill"
+            ></image>
+            <view class="picker-item-check" wx:if="{{selectedIndex === index}}">✓</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
   </view>
 
   <text class="workflow-id">智能体ID : {{agent_id || '未设置'}}
     会话ID : {{conversation_id || '未设置'}}</text>
-    
+
 
   
   
