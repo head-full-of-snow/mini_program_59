@@ -410,6 +410,61 @@
   transform: scale(0.98);
 }
 
+/* 头像删除按钮 */
+.avatar-delete-btn {
+  position: absolute;
+  top: 5rpx;
+  right: 5rpx;
+  width: 36rpx;
+  height: 36rpx;
+  background-color: #fa5151;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: bold;
+  z-index: 2;
+}
+
+/* 头像上传按钮 */
+.avatar-upload-btn {
+  background-color: #f5f5f5;
+  border: 3rpx dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-upload-btn:active {
+  background-color: #e8e8e8;
+  transform: scale(0.95);
+}
+
+.avatar-upload-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.avatar-upload-icon {
+  font-size: 50rpx;
+  color: #576b95;
+  font-weight: bold;
+}
+
+.avatar-upload-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
 .status-value {
   padding: 5rpx 15rpx;
   border-radius: 20rpx;

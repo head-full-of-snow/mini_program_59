@@ -72,16 +72,12 @@ Page({
     showAvatarModal: false,
     displayedAvatars: [],
     hasMoreAvatars: false,
-    avatarPageSize: 5,
+    avatarPageSize: 10,
     avatarCurrentPage: 1
   },
 
-  // 可选头像列表
-  avatarList: [
-    { name: '狗律师', path: '/images/狗律师.webp' },
-    { name: '猫律师', path: '/images/猫律师.webp' },
-    { name: '鳄鱼', path: '/images/鳄鱼.webp' }
-  ],
+  // 可选头像列表（从存储中动态加载）
+  avatarList: [],
 
   onLoad() {
     this.addLog('info', '页面加载完成');
@@ -97,6 +93,7 @@ Page({
     });
     this.loadChatHistory();
     this.loadAvatarMapping();
+    this.loadAvatarList();
     this.updateCurrentAvatar();
   },
 
@@ -131,7 +128,7 @@ Page({
     // 重置分页
     this.setData({
       avatarCurrentPage: 1,
-      avatarPageSize: 5
+      avatarPageSize: 10
     });
     this.updateDisplayedAvatars();
 
@@ -155,8 +152,9 @@ Page({
     const startIndex = 0;
     const endIndex = currentPage * pageSize;
 
-    const displayed = this.avatarList.slice(startIndex, endIndex);
-    const hasMore = endIndex < this.avatarList.length;
+    const avatarList = this.data.avatarList || [];
+    const displayed = avatarList.slice(startIndex, endIndex);
+    const hasMore = endIndex < avatarList.length;
 
     this.setData({
       displayedAvatars: displayed,
@@ -164,11 +162,12 @@ Page({
     });
   },
 
-  // 显示更多头像
+  // 显示更多头像（每页10个）
   showMoreAvatars() {
+    const currentPage = this.data.avatarCurrentPage;
     this.setData({
-      avatarPageSize: 10,
-      avatarCurrentPage: 1
+      avatarCurrentPage: currentPage + 1,
+      avatarPageSize: 10
     });
     this.updateDisplayedAvatars();
   },
@@ -193,6 +192,190 @@ Page({
     wx.showToast({
       title: '头像已更新',
       icon: 'success'
+    });
+  },
+
+  // 从本地存储加载头像列表
+  loadAvatarList() {
+    try {
+      // 从缓存加载用户自定义头像
+      const customAvatars = wx.getStorageSync('agentCustomAvatars') || [];
+
+      // 默认头像列表（从 images 文件夹读取）
+      const defaultAvatars = [
+        { name: '狗律师', path: '/images/狗律师.webp', isCustom: false },
+        { name: '猫律师', path: '/images/猫律师.webp', isCustom: false },
+        { name: '鳄鱼', path: '/images/鳄鱼.webp', isCustom: false },
+        { name: '伤心猫', path: '/images/伤心猫.jpg', isCustom: false },
+        { name: '化妆猫', path: '/images/化妆猫.jpeg', isCustom: false },
+        { name: '原神哪吒', path: '/images/原神哪吒.jpg', isCustom: false },
+        { name: '反恐精英', path: '/images/反恐精英.png', isCustom: false },
+        { name: '唐猫', path: '/images/唐猫.jpeg', isCustom: false },
+        { name: '女仆猫', path: '/images/女仆猫.jpeg', isCustom: false },
+        { name: '恩情', path: '/images/恩情.gif', isCustom: false },
+        { name: '意林', path: '/images/意林.png', isCustom: false },
+        { name: '指挥官', path: '/images/指挥官.png', isCustom: false },
+        { name: '搜图神器', path: '/images/搜图神器_1742820321018.png', isCustom: false },
+        { name: '敦煌狗', path: '/images/敦煌狗.png', isCustom: false },
+        { name: '旋转猫', path: '/images/旋转猫.jpg', isCustom: false },
+        { name: '林2猫', path: '/images/林2猫.jpeg', isCustom: false },
+        { name: '溃军', path: '/images/溃军.jpeg', isCustom: false },
+        { name: '牛1', path: '/images/牛1.png', isCustom: false },
+        { name: '特朗普', path: '/images/特朗普.png', isCustom: false },
+        { name: '狼', path: '/images/狼.png', isCustom: false },
+        { name: '猫仙人', path: '/images/猫仙人.png', isCustom: false },
+        { name: '猴', path: '/images/猴.jpeg', isCustom: false },
+        { name: '睡狗', path: '/images/睡狗.png', isCustom: false },
+        { name: '福建人', path: '/images/福建人.jpeg', isCustom: false },
+        { name: '老家狗', path: '/images/老家狗.jpg', isCustom: false },
+        { name: '老家白狗', path: '/images/老家白狗.jpg', isCustom: false },
+        { name: '老黄', path: '/images/老黄.jpg', isCustom: false },
+        { name: '耄耋彪', path: '/images/耄耋彪.jpg', isCustom: false },
+        { name: '耄耋连招', path: '/images/耄耋连招.gif', isCustom: false },
+        { name: '耄耋震惊', path: '/images/耄耋震惊.jpeg', isCustom: false },
+        { name: '钓鱼', path: '/images/钓鱼.jpeg', isCustom: false },
+        { name: '难掩笑容', path: '/images/难掩笑容.jpeg', isCustom: false },
+        { name: '高清快乐耄耋', path: '/images/高清快乐耄耋.jpeg', isCustom: false }
+      ];
+
+      // 合并默认头像和自定义头像
+      const avatarList = [...defaultAvatars, ...customAvatars];
+      this.setData({ avatarList: avatarList });
+    } catch (e) {
+      this.addLog('error', `加载头像列表失败: ${e.message}`);
+    }
+  },
+
+  // 保存头像列表到本地存储（仅保存自定义头像）
+  saveAvatarList() {
+    try {
+      const customAvatars = this.data.avatarList.filter(avatar => avatar.isCustom);
+      wx.setStorageSync('agentCustomAvatars', customAvatars);
+    } catch (e) {
+      this.addLog('error', `保存头像列表失败: ${e.message}`);
+    }
+  },
+
+  // 上传新头像
+  uploadAvatar() {
+    const that = this;
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const tempFilePath = res.tempFiles[0].tempFilePath;
+
+        // 获取图片信息
+        wx.getImageInfo({
+          src: tempFilePath,
+          success: (imgInfo) => {
+            // 生成唯一文件名
+            const timestamp = Date.now();
+            const fileName = `avatar_${timestamp}.jpg`;
+
+            // 使用文件系统管理器保存图片
+            const fsm = wx.getFileSystemManager();
+            const savedFilePath = `${wx.env.USER_DATA_PATH}/${fileName}`;
+
+            try {
+              // 复制临时文件到用户数据目录
+              fsm.copyFileSync(tempFilePath, savedFilePath);
+
+              // 添加到头像列表
+              const newAvatar = {
+                name: `自定义${timestamp}`,
+                path: savedFilePath,
+                isCustom: true
+              };
+
+              const updatedList = [...that.data.avatarList, newAvatar];
+              that.setData({
+                avatarList: updatedList
+              });
+
+              // 保存到本地存储（仅自定义头像）
+              that.saveAvatarList();
+              that.updateDisplayedAvatars();
+
+              // 自动选择新上传的头像
+              const agentId = that.data.agent_id;
+              const mapping = that.data.avatarMapping;
+              mapping[agentId] = savedFilePath;
+
+              that.setData({
+                avatarMapping: mapping,
+                currentAvatar: savedFilePath
+              });
+              that.saveAvatarMapping();
+
+              wx.showToast({
+                title: '头像已上传并设置',
+                icon: 'success'
+              });
+            } catch (err) {
+              that.addLog('error', `保存图片失败: ${err.message}`);
+              wx.showToast({
+                title: '保存图片失败',
+                icon: 'none'
+              });
+            }
+          },
+          fail: (err) => {
+            that.addLog('error', `获取图片信息失败: ${err.errMsg}`);
+          }
+        });
+      },
+      fail: (err) => {
+        that.addLog('error', `选择图片失败: ${err.errMsg}`);
+      }
+    });
+  },
+
+  // 删除自定义头像
+  deleteCustomAvatar(e) {
+    const index = e.currentTarget.dataset.index;
+    const avatar = this.data.avatarList[index];
+
+    // 只允许删除自定义头像
+    if (!avatar.isCustom) {
+      wx.showToast({
+        title: '无法删除默认头像',
+        icon: 'none'
+      });
+      return;
+    }
+
+    const that = this;
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除这个自定义头像吗？',
+      success: (res) => {
+        if (res.confirm) {
+          try {
+            // 从文件系统中删除
+            const fsm = wx.getFileSystemManager();
+            fsm.unlinkSync(avatar.path);
+
+            // 从列表中删除
+            const updatedList = that.data.avatarList.filter((_, i) => i !== index);
+            that.setData({ avatarList: updatedList });
+            that.saveAvatarList();
+            that.updateDisplayedAvatars();
+
+            wx.showToast({
+              title: '已删除',
+              icon: 'success'
+            });
+          } catch (err) {
+            that.addLog('error', `删除图片失败: ${err.message}`);
+            wx.showToast({
+              title: '删除失败',
+              icon: 'none'
+            });
+          }
+        }
+      }
     });
   },
 

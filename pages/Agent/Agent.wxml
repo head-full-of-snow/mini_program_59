@@ -48,6 +48,15 @@
           >
             <image class="avatar-grid-image" src="{{item.path}}" mode="aspectFill"></image>
             <view class="avatar-selected-icon" wx:if="{{currentAvatar === item.path}}">✓</view>
+            <view class="avatar-delete-btn" wx:if="{{item.isCustom}}" catchtap="deleteCustomAvatar" data-index="{{index}}">
+              <text>×</text>
+            </view>
+          </view>
+          <view class="avatar-grid-item avatar-upload-btn" bindtap="uploadAvatar">
+            <view class="avatar-upload-content">
+              <text class="avatar-upload-icon">+</text>
+              <text class="avatar-upload-text">上传</text>
+            </view>
           </view>
         </view>
         <view class="avatar-more-btn" bindtap="showMoreAvatars" wx:if="{{hasMoreAvatars}}">
