@@ -17,8 +17,8 @@
       </view>
     </view>
     <view class="header-actions">
-      <button class="action-btn clear-chat-btn" bindtap="clearChat" wx:if="{{chatMessages.length > 0}}">
-        <text>🗑️ 清空</text>
+      <button class="action-btn clear-chat-btn" bindtap="clearChat">
+        <text>💬 开启新对话</text>
       </button>
     </view>
   </view>
@@ -92,7 +92,7 @@
     <view class="workflow-picker" bindtap="showAgentPicker">
       <view class="picker-text">
         <view class="picker-content">
-          <text class="picker-name">{{Agent_List[selectedIndex].name }}</text>
+          <text class="picker-name picker-name-truncated">{{Agent_List[selectedIndex].name}}</text>
           <text class="picker-arrow">▼</text>
         </view>
       </view>

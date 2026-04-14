@@ -215,8 +215,8 @@
 .avatar-container-small {
   position: absolute;
   left: 0;
-  width: 80rpx;
-  height: 80rpx;
+  width: 120rpx;
+  height: 120rpx;
   cursor: pointer;
   z-index: 1;
 }
@@ -237,8 +237,8 @@
 }
 
 .workflow-avatar-small {
-  width: 80rpx;
-  height: 80rpx;
+  width: 100rpx;
+  height: 100rpx;
   border-radius: 50%;
   border: 3rpx solid #576b95;
   box-shadow: 0 2rpx 8rpx rgba(87, 107, 149, 0.3);
@@ -744,8 +744,7 @@
 /* 历史记录按钮（内联） */
 .history-btn-inline {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 0;
   font-size: 24rpx;
   padding: 8rpx 20rpx;
   background-color: #e8f4ff;
@@ -783,9 +782,18 @@
   color: #333;
 }
 
+.picker-name-truncated {
+  max-width: 280rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+}
+
 .picker-arrow {
   font-size: 20rpx;
   color: #576b95;
+  flex-shrink: 0;
 }
 
 /* 自定义选择器弹窗 */
@@ -964,8 +972,8 @@
 }
 
 .clear-chat-btn {
-  background-color: #fff2f0;
-  color: #fa5151;
+  background-color: #e8f4ff;
+  color: #576b95;
 }
 
 /* 历史面板 - 从左侧滑出 */

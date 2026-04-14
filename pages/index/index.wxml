@@ -21,6 +21,7 @@
       </view>
       <view class="card-item" bindtap="goToagent">
         <image src="/images/狗律师.webp" class="card-icon" mode="aspectFit"></image>
+        <!-- <image src="{{oss_url}}%e6%8C%87%E6%8C%A5%E5%AE%98.png" class="card-icon" mode="aspectFit"></image> -->
         <text class="card-title">智能体助手</text>
         <text class="card-desc">与AI智能体对话</text>
       </view>

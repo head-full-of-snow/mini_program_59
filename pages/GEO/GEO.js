@@ -202,42 +202,55 @@ Page({
       // 从缓存加载用户自定义头像
       const customAvatars = wx.getStorageSync('geoCustomAvatars') || [];
 
-      // 默认头像列表（从 images 文件夹读取）
-      const defaultAvatars = [
-        { name: '狗律师', path: '/images/狗律师.webp', isCustom: false },
-        { name: '猫律师', path: '/images/猫律师.webp', isCustom: false },
-        { name: '鳄鱼', path: '/images/鳄鱼.webp', isCustom: false },
-        { name: '伤心猫', path: '/images/伤心猫.jpg', isCustom: false },
-        { name: '化妆猫', path: '/images/化妆猫.jpeg', isCustom: false },
-        { name: '原神哪吒', path: '/images/原神哪吒.jpg', isCustom: false },
-        { name: '反恐精英', path: '/images/反恐精英.png', isCustom: false },
-        { name: '唐猫', path: '/images/唐猫.jpeg', isCustom: false },
-        { name: '女仆猫', path: '/images/女仆猫.jpeg', isCustom: false },
-        { name: '恩情', path: '/images/恩情.gif', isCustom: false },
-        { name: '意林', path: '/images/意林.png', isCustom: false },
-        { name: '指挥官', path: '/images/指挥官.png', isCustom: false },
-        { name: '搜图神器', path: '/images/搜图神器_1742820321018.png', isCustom: false },
-        { name: '敦煌狗', path: '/images/敦煌狗.png', isCustom: false },
-        { name: '旋转猫', path: '/images/旋转猫.jpg', isCustom: false },
-        { name: '林2猫', path: '/images/林2猫.jpeg', isCustom: false },
-        { name: '溃军', path: '/images/溃军.jpeg', isCustom: false },
-        { name: '牛1', path: '/images/牛1.png', isCustom: false },
-        { name: '特朗普', path: '/images/特朗普.png', isCustom: false },
-        { name: '狼', path: '/images/狼.png', isCustom: false },
-        { name: '猫仙人', path: '/images/猫仙人.png', isCustom: false },
-        { name: '猴', path: '/images/猴.jpeg', isCustom: false },
-        { name: '睡狗', path: '/images/睡狗.png', isCustom: false },
-        { name: '福建人', path: '/images/福建人.jpeg', isCustom: false },
-        { name: '老家狗', path: '/images/老家狗.jpg', isCustom: false },
-        { name: '老家白狗', path: '/images/老家白狗.jpg', isCustom: false },
-        { name: '老黄', path: '/images/老黄.jpg', isCustom: false },
-        { name: '耄耋彪', path: '/images/耄耋彪.jpg', isCustom: false },
-        { name: '耄耋连招', path: '/images/耄耋连招.gif', isCustom: false },
-        { name: '耄耋震惊', path: '/images/耄耋震惊.jpeg', isCustom: false },
-        { name: '钓鱼', path: '/images/钓鱼.jpeg', isCustom: false },
-        { name: '难掩笑容', path: '/images/难掩笑容.jpeg', isCustom: false },
-        { name: '高清快乐耄耋', path: '/images/高清快乐耄耋.jpeg', isCustom: false }
+      // 获取 OSS URL
+      const ossUrl = getApp().globalData.oss_url;
+
+      // 默认头像文件名列表（保留原有）
+      const defaultAvatarFiles = [
+        { name: '狗律师', fileName: '狗律师.webp' },
+        { name: '猫律师', fileName: '猫律师.webp' },
+        { name: '鳄鱼', fileName: '鳄鱼.webp' },
+        { name: '伤心猫', fileName: '伤心猫.jpg' },
+        { name: '化妆猫', fileName: '化妆猫.jpeg' },
+        { name: '原神哪吒', fileName: '原神哪吒.jpg' },
+        { name: '反恐精英', fileName: '反恐精英.png' },
+        { name: '唐猫', fileName: '唐猫.jpeg' },
+        { name: '女仆猫', fileName: '女仆猫.jpeg' },
+        { name: '恩情', fileName: '恩情.gif' },
+        { name: '意林', fileName: '意林.png' },
+        { name: '指挥官', fileName: '指挥官.png' },
+        { name: '搜图神器', fileName: '搜图神器_1742820321018.png' },
+        { name: '敦煌狗', fileName: '敦煌狗.png' },
+        { name: '旋转猫', fileName: '旋转猫.jpg' },
+        { name: '林2猫', fileName: '林2猫.jpeg' },
+        { name: '溃军', fileName: '溃军.jpeg' },
+        { name: '牛1', fileName: '牛1.png' },
+        { name: '特朗普', fileName: '特朗普.png' },
+        { name: '狼', fileName: '狼.png' },
+        { name: '猫仙人', fileName: '猫仙人.png' },
+        { name: '猴', fileName: '猴.jpeg' },
+        { name: '睡狗', fileName: '睡狗.png' },
+        { name: '福建人', fileName: '福建人.jpeg' },
+        { name: '老家狗', fileName: '老家狗.jpg' },
+        { name: '老家白狗', fileName: '老家白狗.jpg' },
+        { name: '老黄', fileName: '老黄.jpg' },
+        { name: '耄耋彪', fileName: '耄耋彪.jpg' },
+        { name: '耄耋连招', fileName: '耄耋连招.gif' },
+        { name: '耄耋震惊', fileName: '耄耋震惊.jpeg' },
+        { name: '钓鱼', fileName: '钓鱼.jpeg' },
+        { name: '难掩笑容', fileName: '难掩笑容.jpeg' },
+        { name: '高清快乐耄耋', fileName: '高清快乐耄耋.jpeg' }
       ];
+
+      // 将文件名转换为 UTF-8 编码并拼接 OSS URL
+      const defaultAvatars = defaultAvatarFiles.map(item => {
+        const encodedFileName = encodeURIComponent(item.fileName);
+        return {
+          name: item.name,
+          path: ossUrl + encodedFileName,
+          isCustom: false
+        };
+      });
 
       // 合并默认头像和自定义头像
       const avatarList = [...defaultAvatars, ...customAvatars];
@@ -613,8 +626,8 @@ Page({
   // 清空当前聊天
   clearChat() {
     wx.showModal({
-      title: '确认清空',
-      content: '确定要清空当前聊天记录吗？',
+      title: '开启新对话',
+      content: '你将离开该对话，该对话已保存到历史',
       success: (res) => {
         if (res.confirm) {
           if (this.data.chatMessages.length > 0) {
@@ -629,7 +642,7 @@ Page({
             conversation_id: false
           });
           wx.showToast({
-            title: '已清空',
+            title: '已开启新对话',
             icon: 'success'
           });
         }

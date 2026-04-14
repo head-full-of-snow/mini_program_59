@@ -35,6 +35,9 @@ App({
   },
   globalData: {
     userInfo: null,
-    websocket_url:"wss://django-dsc6-prod-8g52b3gg19eac702-1314260299.ap-shanghai.run.wxcloudrun.com"
+    websocket_url:"wss://zxh-59-mini-program-59-7ge47bw0d2b9642e-1422034208.ap-shanghai.run.wxcloudrun.com",
+    oss_url:"https://mini-program-zxh-59.oss-cn-beijing.aliyuncs.com/mini-program/images/"
   }
 })
+
+//  wss://zxh-59-mini-program-59-7ge47bw0d2b9642e-1422034208.ap-shanghai.run.wxcloudrun.com

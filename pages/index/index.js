@@ -2,12 +2,16 @@ Page({
   data: {
     apiData: '点击下方按钮获取数据',
     logs: [],
+    serverUrl:"",
+    oss_url :""
   },
   onLoad() {
     this.addLog('info', '页面加载完成');
     const websocket_url =getApp().globalData.websocket_url;
+    const oss_url =getApp().globalData.oss_url;
     this.setData({
-      serverUrl :websocket_url
+      serverUrl :websocket_url,
+      oss_url : oss_url
     });
     this.connectWebSocket();
   },
