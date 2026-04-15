@@ -288,6 +288,13 @@ Page({
     });
   },
 
+  // 关闭开始游戏弹窗
+  closeStartModal() {
+    this.setData({
+      showStartModal: false
+    });
+  },
+
   selectMode(e) {
     const mode = e.currentTarget.dataset.mode;
     this.setData({
@@ -310,6 +317,13 @@ Page({
       });
       this.sendModeMessage('你来猜猜我想什么');
     }
+  },
+
+  // 关闭模式选择弹窗
+  closeModeSelection() {
+    this.setData({
+      showModeSelection: false
+    });
   },
 
   // 发送模式选择消息
@@ -370,6 +384,13 @@ Page({
       });
     }
 
+    this.setData({
+      showGameEndModal: false
+    });
+  },
+
+  // 关闭游戏结束弹窗
+  closeGameEndModal() {
     this.setData({
       showGameEndModal: false
     });
@@ -616,6 +637,7 @@ Page({
         agentId: this.data.agent_id,
         preview: preview,
         messages: this.data.chatMessages,
+        gameMode: this.data.gameMode, // 保存游戏模式
         timestamp: new Date().getTime(),
         timeString: new Date().toLocaleString()
       };
@@ -661,15 +683,34 @@ Page({
     const index = e.currentTarget.dataset.index;
     const historyItem = this.data.chatHistory[index];
     if (historyItem) {
+      // 根据游戏模式设置UI状态
+      let inputAreaDisabled = false;
+      let showAnswerButtons = false;
+
+      if (historyItem.gameMode === 'answer') {
+        // AI猜谜模式：隐藏输入框，显示答题按钮
+        inputAreaDisabled = true;
+        showAnswerButtons = true;
+      } else if (historyItem.gameMode === 'guess') {
+        // 玩家猜谜模式：显示输入框
+        inputAreaDisabled = false;
+        showAnswerButtons = false;
+      }
+
       this.setData({
         chatMessages: historyItem.messages,
         agent_id: historyItem.agentId,
         conversation_id: historyItem.conversationId,
+        gameMode: historyItem.gameMode || '',
+        inputAreaDisabled: inputAreaDisabled,
+        showAnswerButtons: showAnswerButtons,
         showHistoryPanel: false,
         isReceivingDone: true
       });
+
+      const modeText = historyItem.gameMode === 'guess' ? '我来猜' : '答题';
       wx.showToast({
-        title: '已加载历史记录',
+        title: `已加载历史记录 (${modeText}模式)`,
         icon: 'success'
       });
     }

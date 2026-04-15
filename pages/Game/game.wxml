@@ -17,7 +17,7 @@
           ></image>
           <view class="avatar-tip-small" wx:if="{{!currentAvatar}}">+</view>
         </view>
-        <text class="welcome-title {{isConnected ? 'connected' : 'disconnected'}}">是或不是游戏</text>
+        <text class="welcome-title {{isConnected ? 'connected' : 'disconnected'}}">是或不是</text>
       </view>
     </view>
     <view class="header-actions">
@@ -25,7 +25,7 @@
         <text>📜 历史</text>
       </button>
       <button class="action-btn clear-chat-btn" bindtap="clearChat">
-        <text>💬 开启新对话</text>
+        <text>💬 开启新游戏</text>
       </button>
     </view>
   </view>
@@ -181,15 +181,17 @@
 
   <!-- 开始游戏弹窗 -->
   <view class="game-modal {{showStartModal ? 'show' : ''}}" wx:if="{{showStartModal}}">
-    <view class="game-modal-mask" bindtap=""></view>
+    <view class="game-modal-mask" bindtap="closeStartModal"></view>
     <view class="game-modal-content">
       <view class="game-modal-header">
         <text class="game-modal-title">游戏邀请</text>
+        <view class="game-modal-close" bindtap="closeStartModal">×</view>
       </view>
       <view class="game-modal-body">
         <text class="game-modal-text">您要游玩是或不是吗？</text>
       </view>
       <view class="game-modal-footer">
+        <button class="game-modal-btn game-modal-btn-secondary" bindtap="closeStartModal">取消</button>
         <button class="game-modal-btn game-modal-btn-primary" bindtap="startGame">开始</button>
       </view>
     </view>
@@ -197,10 +199,11 @@
 
   <!-- 模式选择弹窗 -->
   <view class="game-modal {{showModeSelection ? 'show' : ''}}" wx:if="{{showModeSelection}}">
-    <view class="game-modal-mask" bindtap=""></view>
+    <view class="game-modal-mask" bindtap="closeModeSelection"></view>
     <view class="game-modal-content">
       <view class="game-modal-header">
         <text class="game-modal-title">选择模式</text>
+        <view class="game-modal-close" bindtap="closeModeSelection">×</view>
       </view>
       <view class="game-modal-body">
         <button class="mode-select-btn" bindtap="selectMode" data-mode="guess">
@@ -217,10 +220,11 @@
 
   <!-- 游戏结束弹窗 -->
   <view class="game-modal {{showGameEndModal ? 'show' : ''}}" wx:if="{{showGameEndModal}}">
-    <view class="game-modal-mask" bindtap=""></view>
+    <view class="game-modal-mask" bindtap="closeGameEndModal"></view>
     <view class="game-modal-content">
       <view class="game-modal-header">
         <text class="game-modal-title">游戏结束</text>
+        <view class="game-modal-close" bindtap="closeGameEndModal">×</view>
       </view>
       <view class="game-modal-body">
         <text class="game-modal-text">游戏已结束，您想要？</text>
