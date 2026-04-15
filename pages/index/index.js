@@ -30,6 +30,11 @@ Page({
       url: '/pages/Agent_cloud/Agent_cloud'
     })
   },
+  goTogame() {
+    wx.navigateTo({
+      url: '/pages/Game/game'
+    })
+  },
 
   fetchData() {
     const that = this;

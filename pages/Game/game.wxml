@@ -1,4 +1,5 @@
-<!--pages/GEO/GEO.wxml-->
+<!-- pages/Game/game.wxml -->
+
 <view class="chat-container">
   <!-- 顶部状态栏占位符 -->
   <view class="header-placeholder"></view>
@@ -8,18 +9,21 @@
   <view class="header">
     <view class="status-section">
       <view class="title-with-avatar">
-        <text class="welcome-title {{isConnected ? 'connected' : 'disconnected'}}">工作流</text>
         <view class="avatar-container-small" bindtap="chooseAvatar">
           <image
-            class="workflow-avatar-small {{currentAvatar ? '' : 'avatar-empty'}}"
+            class="agent-avatar-small {{currentAvatar ? '' : 'avatar-empty'}}"
             src="{{currentAvatar || ''}}"
             mode="aspectFill"
           ></image>
           <view class="avatar-tip-small" wx:if="{{!currentAvatar}}">+</view>
         </view>
+        <text class="welcome-title {{isConnected ? 'connected' : 'disconnected'}}">是或不是游戏</text>
       </view>
     </view>
     <view class="header-actions">
+      <button class="action-btn history-btn" bindtap="toggleHistoryPanel">
+        <text>📜 历史</text>
+      </button>
       <button class="action-btn clear-chat-btn" bindtap="clearChat">
         <text>💬 开启新对话</text>
       </button>
@@ -63,11 +67,11 @@
     </view>
   </view>
 
-  <!-- 历史记录侧边栏 -->
+  <!-- 历史记录面板 -->
   <view class="history-panel {{showHistoryPanel ? 'show' : ''}}" wx:if="{{showHistoryPanel}}">
     <view class="history-panel-content" catchtap="stopPropagation">
       <view class="history-header">
-        <text class="history-title">📜 聊天历史记录</text>
+        <text class="history-title">📜 游戏历史记录</text>
         <button class="close-btn" bindtap="toggleHistoryPanel">×</button>
       </view>
       <scroll-view class="history-list" scroll-y>
@@ -76,7 +80,7 @@
         </view>
         <view class="history-item" wx:for="{{chatHistory}}" wx:key="conversationId" bindtap="loadHistory" data-index="{{index}}">
           <view class="history-item-header">
-            <text class="history-workflow">{{item.workflowName}}</text>
+            <text class="history-agent">{{item.agentName}}</text>
             <text class="history-conversation-id">会话ID: {{item.conversationId.substring(0, 8)}}...</text>
           </view>
           <text class="history-preview">{{item.preview}}</text>
@@ -88,64 +92,22 @@
       </scroll-view>
     </view>
   </view>
-  
-<!-- 上下滚动轮盘：选择预设名字 -->
-  <view class="input-picker-group">
-    <!-- 自定义选择器 -->
-    <view class="workflow-picker" bindtap="showWorkflowPicker">
-      <view class="picker-text">
-        <view class="picker-content">
-          <text class="picker-name picker-name-truncated">{{workflowList[selectedIndex].name}}</text>
-          <text class="picker-arrow">▼</text>
-        </view>
-      </view>
-    </view>
 
-    <!-- 历史记录按钮 -->
-    <button class="action-btn history-btn-inline" bindtap="toggleHistoryPanel">
-      <text>📜 历史</text>
-    </button>
-  </view>
-
-  <!-- 自定义选择器弹窗 -->
-  <view class="picker-modal {{showPickerModal ? 'show' : ''}}" wx:if="{{showPickerModal}}">
-    <view class="picker-modal-mask" bindtap="hidePickerModal"></view>
-    <view class="picker-modal-content">
-      <view class="picker-modal-header">
-        <text class="picker-modal-title">选择工作流</text>
-        <view class="picker-modal-close" bindtap="hidePickerModal">×</view>
-      </view>
-      <scroll-view class="picker-modal-body" scroll-y>
-        <view class="picker-item-list">
-          <view
-            class="picker-item {{selectedIndex === index ? 'selected' : ''}}"
-            wx:for="{{workflowList}}"
-            wx:key="id"
-            bindtap="selectWorkflow"
-            data-index="{{index}}"
-          >
-            <text class="picker-item-name">{{item.name}}</text>
-            <image
-              class="picker-item-avatar"
-              wx:if="{{avatarMapping[item.id]}}"
-              src="{{avatarMapping[item.id]}}"
-              mode="aspectFill"
-            ></image>
-            <view class="picker-item-check" wx:if="{{selectedIndex === index}}">✓</view>
-          </view>
-        </view>
-      </scroll-view>
-    </view>
-  </view>
-
-  <!-- <text class="workflow-id">工作流ID : {{workflow_id || '未设置'}}
+  <!-- <text class="workflow-id">智能体ID : {{agent_id || '未设置'}}
     会话ID : {{conversation_id || '未设置'}}</text> -->
 
-
-  
-  
   <!-- 聊天消息列表 -->
   <scroll-view class="messages-container" scroll-y scroll-top="{{scrollTop}}" scroll-with-animation>
+    <!-- Loading indicator -->
+    <view class="loading-indicator" wx:if="{{receivedData && !isReceivingDone}}">
+      <text class="loading-text">🤖 AI正在输入</text>
+      <view class="loading-dots">
+        <text class="dot">.</text>
+        <text class="dot">.</text>
+        <text class="dot">.</text>
+      </view>
+    </view>
+
     <view class="message-item {{item.type}}-message" wx:for="{{chatMessages}}" wx:key="id">
       <view class="avatar {{item.type}}-avatar">{{item.type === 'user' ? '我' : 'AI'}}</view>
       <view class="message-bubble {{item.type}}-bubble">
@@ -166,78 +128,107 @@
         </view>
       </view>
     </view>
-    
+
     <!-- 当前正在接收的消息 -->
     <view class="message-item ai-message" wx:if="{{receivedData && !isReceivingDone}}">
       <view class="avatar ai-avatar">AI</view>
-      <view class="thinking-container" >
+      <view class="thinking-container">
         <text class="thinking-content" wx:if="{{isexpanded}}">
-        {{thinkingdata}}
+          {{thinkingdata}}
         </text>
         <text bindtap="changeisexpanded" wx:if="{{isexpanded}}">
-        👉点击折叠思考过程</text>
+          👉点击折叠思考过程
+        </text>
         <view class="thinking-content" bindtap="changeisexpanded" wx:if="{{!isexpanded}}">
           <text>👉 点击展开思考过程</text>
         </view>
       </view>
-      <view class="messages-container">
+      <view class="message-bubble ai-bubble">
         <text class="message-text">{{resultdata}}</text>
       </view>
-
-      
     </view>
   </scroll-view>
-  
-  <!-- 输入区域 -->
-  <view class="input-area">
-    <input 
-      class="chat-input" 
-      placeholder="输入消息..." 
-      value="{{inputMessage}}" 
+
+  <!-- 答题按钮区域（仅答题模式显示） -->
+  <view class="answer-buttons-area" wx:if="{{showAnswerButtons}}">
+    <view class="answer-buttons-row">
+      <button class="answer-btn" bindtap="sendAnswer" data-answer="是">是</button>
+      <button class="answer-btn" bindtap="sendAnswer" data-answer="不是">不是</button>
+    </view>
+    <view class="answer-buttons-row">
+      <button class="answer-btn" bindtap="sendAnswer" data-answer="可能是">可能是</button>
+      <button class="answer-btn" bindtap="sendAnswer" data-answer="可能不是">可能不是</button>
+    </view>
+    <view class="answer-buttons-row">
+      <button class="answer-btn answer-btn-wide" bindtap="sendAnswer" data-answer="不知道">不知道</button>
+    </view>
+  </view>
+
+  <!-- 输入区域（答题模式时隐藏） -->
+  <view class="input-area" wx:if="{{!inputAreaDisabled}}">
+    <textarea
+      class="chat-input textarea-input"
+      placeholder="输入消息..."
+      value="{{inputMessage}}"
       bindinput="onInputMessageChange"
-      confirm-type="send"
-      bindconfirm="sendMessage"
+      auto-height
+      maxlength="500"
     />
-    <button class="send-button" bindtap="sendMessage" disabled="{{!inputMessage || !isConnected}}">
+    <button class="send-button send-btn-short" bindtap="sendMessage" disabled="{{!inputMessage || !isConnected}}">
       <text class="send-text">发送</text>
     </button>
   </view>
 
-
-  <!-- 控制按钮 -->
-  <view class="button-section">
-    <button class="btn connect-btn" bindtap="connectWebSocket" type="primary" hidden>
-      连接
-    </button>
-    <button class="btn disconnect-btn" bindtap="disconnectWebSocket" hidden>
-      断开
-    </button>
-    <button class="btn clear-btn" bindtap="clearLog" hidden>
-      清空日志
-    </button>
-  </view>
-  
-  
-  <!-- 日志显示 -->
-  <view class="log-section" hidden>
-    <text class="label">通信日志:</text>
-    <scroll-view class="log-container" scroll-y>
-      <view class="log-item {{item.type}}" wx:for="{{logs}}" wx:key="index">
-        <text class="log-time">{{item.time}}</text>
-        <text class="log-content">{{item.content}}</text>
+  <!-- 开始游戏弹窗 -->
+  <view class="game-modal {{showStartModal ? 'show' : ''}}" wx:if="{{showStartModal}}">
+    <view class="game-modal-mask" bindtap=""></view>
+    <view class="game-modal-content">
+      <view class="game-modal-header">
+        <text class="game-modal-title">游戏邀请</text>
       </view>
-    </scroll-view>
+      <view class="game-modal-body">
+        <text class="game-modal-text">您要游玩是或不是吗？</text>
+      </view>
+      <view class="game-modal-footer">
+        <button class="game-modal-btn game-modal-btn-primary" bindtap="startGame">开始</button>
+      </view>
+    </view>
   </view>
 
+  <!-- 模式选择弹窗 -->
+  <view class="game-modal {{showModeSelection ? 'show' : ''}}" wx:if="{{showModeSelection}}">
+    <view class="game-modal-mask" bindtap=""></view>
+    <view class="game-modal-content">
+      <view class="game-modal-header">
+        <text class="game-modal-title">选择模式</text>
+      </view>
+      <view class="game-modal-body">
+        <button class="mode-select-btn" bindtap="selectMode" data-mode="guess">
+          <text class="mode-select-icon">🔮</text>
+          <text class="mode-select-text">我来猜猜你想什么</text>
+        </button>
+        <button class="mode-select-btn" bindtap="selectMode" data-mode="answer">
+          <text class="mode-select-icon">🎯</text>
+          <text class="mode-select-text">你来猜猜我想什么</text>
+        </button>
+      </view>
+    </view>
+  </view>
 
-
-
-
+  <!-- 游戏结束弹窗 -->
+  <view class="game-modal {{showGameEndModal ? 'show' : ''}}" wx:if="{{showGameEndModal}}">
+    <view class="game-modal-mask" bindtap=""></view>
+    <view class="game-modal-content">
+      <view class="game-modal-header">
+        <text class="game-modal-title">游戏结束</text>
+      </view>
+      <view class="game-modal-body">
+        <text class="game-modal-text">游戏已结束，您想要？</text>
+      </view>
+      <view class="game-modal-footer">
+        <button class="game-modal-btn" bindtap="handleGameEndChoice" data-choice="summary">总结本次游戏</button>
+        <button class="game-modal-btn game-modal-btn-secondary" bindtap="handleGameEndChoice" data-choice="nothing">暂时不用</button>
+      </view>
+    </view>
+  </view>
 </view>
-  
-
-
-  
-
-  
-  

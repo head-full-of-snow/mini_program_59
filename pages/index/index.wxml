@@ -27,4 +27,12 @@
       </view>
     </view>
   </view>
+
+  <!-- Game页面入口（放在最下方） -->
+  <view class="game-entry-section">
+    <view class="game-entry-card" bindtap="goTogame">
+      <text class="game-entry-title">🎮 是或不是游戏</text>
+      <text class="game-entry-desc">和AI一起玩猜谜游戏</text>
+    </view>
+  </view>
 </view>

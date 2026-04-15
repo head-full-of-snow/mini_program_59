@@ -1,6 +1,11 @@
 <!--pages/Agent/Agent.wxml-->
 
 <view class="chat-container">
+  <!-- 顶部状态栏占位符 -->
+  <view class="header-placeholder"></view>
+  <view class="workflow-id-placeholder"></view>
+  <view class="input-picker-placeholder"></view>
+
   <!-- 顶部状态栏 -->
   <view class="header">
     <view class="status-section">
@@ -135,8 +140,8 @@
     </view>
   </view>
 
-  <text class="workflow-id">智能体ID : {{agent_id || '未设置'}}
-    会话ID : {{conversation_id || '未设置'}}</text>
+  <!-- <text class="workflow-id">智能体ID : {{agent_id || '未设置'}}
+    会话ID : {{conversation_id || '未设置'}}</text> -->
 
 
   

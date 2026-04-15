@@ -2,8 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/GEO/GEO",
-    "pages/Agent/Agent"
-    
+    "pages/Agent/Agent",
+    "pages/Game/game"
   ],
   "window": {
     "navigationBarTitleText": "传智杯AI微信小程序-南海59号",
