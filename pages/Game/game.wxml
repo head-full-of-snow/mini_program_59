@@ -97,7 +97,13 @@
     会话ID : {{conversation_id || '未设置'}}</text> -->
 
   <!-- 聊天消息列表 -->
-  <scroll-view class="messages-container" scroll-y scroll-top="{{scrollTop}}" scroll-with-animation>
+  <scroll-view
+    class="messages-container"
+    scroll-y
+    scroll-top="{{scrollTop}}"
+    scroll-with-animation
+    bindscroll="onScroll"
+  >
     <!-- Loading indicator -->
     <view class="loading-indicator" wx:if="{{receivedData && !isReceivingDone}}">
       <text class="loading-text">🤖 AI正在输入</text>
@@ -146,6 +152,16 @@
       <view class="message-bubble ai-bubble">
         <text class="message-text">{{resultdata}}</text>
       </view>
+    </view>
+
+    <!-- 滚动到底部悬浮按钮 -->
+    <view
+      class="scroll-to-bottom-btn {{showScrollToBottomBtn ? 'show' : ''}}"
+      bindtap="scrollToBottom"
+      wx:if="{{showScrollToBottomBtn}}"
+    >
+      <text class="scroll-icon">↓</text>
+      <text class="scroll-text">新消息</text>
     </view>
   </scroll-view>
 

@@ -62,6 +62,12 @@ Page({
     // 滚动位置
     scrollTop: 0,
 
+    // 滚动跟踪相关
+    showScrollToBottomBtn: false,
+    isUserScrolling: false,
+    lastScrollTop: 0,
+    scrollThreshold: 50, // 距离底部多少像素时显示按钮
+
     // 历史记录相关
     showHistoryPanel: false,
     chatHistory: [],
@@ -761,6 +767,8 @@ Page({
               resultdata: ''
             });
             this.saveChatHistory();
+            // 新消息到达，触发滚动
+            this.triggerScrollToBottom();
           }
 
           this.addLog('info', `共收到 ${data.total_chunks || '未知数量'} 个数据块`);
@@ -813,6 +821,8 @@ Page({
             receivedData: this.data.receivedData + content,
             isReceivingDone: false
           });
+          // 接收流式数据时触发滚动
+          this.triggerScrollToBottom();
         }
       } catch (error) {
         const errorMsg = `错误类型：${error.name || '未知错误'}\n错误描述：${error.message}\n调用栈：${error.stack || '无'}`;
@@ -884,6 +894,9 @@ Page({
         inputMessage: '', // 清空输入框
         receivedData: '' // 清空之前的数据
       });
+
+      // 发送消息后滚动到底部
+      this.triggerScrollToBottom();
 
       this.data.socketTask.send({
         data: JSON.stringify(data),
@@ -987,6 +1000,49 @@ Page({
       receivedData: ''
     });
     this.addLog('info', '日志已清空');
+  },
+
+  // 滚动事件处理
+  onScroll(e) {
+    const scrollTop = e.detail.scrollTop;
+    const scrollHeight = e.detail.scrollHeight;
+    const viewHeight = e.detail.scrollHeight - scrollTop;
+
+    // 判断是否在底部
+    const isAtBottom = (scrollHeight - scrollTop - viewHeight) < this.data.scrollThreshold;
+
+    // 检测用户是否向上滚动（手动滚动）
+    if (scrollTop < this.data.lastScrollTop) {
+      this.setData({ isUserScrolling: true });
+    } else if (isAtBottom) {
+      // 如果滚动到底部，重置用户滚动标志
+      this.setData({ isUserScrolling: false });
+    }
+
+    // 更新悬浮按钮显示状态
+    this.setData({
+      showScrollToBottomBtn: !isAtBottom,
+      lastScrollTop: scrollTop
+    });
+  },
+
+  // 滚动到底部
+  scrollToBottom() {
+    this.setData({
+      scrollTop: 999999,
+      isUserScrolling: false,
+      showScrollToBottomBtn: false
+    });
+  },
+
+  // 触发滚动到底部（新消息到达时调用）
+  triggerScrollToBottom() {
+    if (!this.data.isUserScrolling) {
+      this.scrollToBottom();
+    } else {
+      // 如果用户正在滚动，显示悬浮按钮提示有新消息
+      this.setData({ showScrollToBottomBtn: true });
+    }
   },
 
   // 测试发送不同类型的数据

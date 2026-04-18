@@ -36,8 +36,19 @@ Page({
     // 心跳定时器
     heartbeatTimer: null,
 
+    // 重连相关
+    reconnectTimer: null,
+    reconnectCount: 0,
+    maxReconnectCount: 5,
+
     // 滚动位置
     scrollTop: 0,
+
+    // 滚动跟踪相关
+    showScrollToBottomBtn: false,
+    isUserScrolling: false,
+    lastScrollTop: 0,
+    scrollThreshold: 50, // 距离底部多少像素时显示按钮
 
     // 游戏相关状态
     showStartModal: false, // 开始游戏弹窗
@@ -121,6 +132,7 @@ Page({
         },
         fail: (err) => {
           this.addLog('error', `连接失败: ${err.errMsg}`);
+          this.tryReconnect();
         }
       })
     });
@@ -135,8 +147,15 @@ Page({
     socketTask.onOpen(() => {
       this.addLog('info', 'WebSocket连接已打开');
       this.setData({
-        isConnected: true
+        isConnected: true,
+        reconnectCount: 0
       });
+
+      // 清除重连定时器
+      if (this.data.reconnectTimer) {
+        clearTimeout(this.data.reconnectTimer);
+        this.setData({ reconnectTimer: null });
+      }
 
       // 连接成功后，显示开始游戏弹窗
       this.setData({
@@ -188,6 +207,8 @@ Page({
 
             // 保存聊天历史
             this.saveChatHistory();
+            // 新消息到达，触发滚动
+            this.triggerScrollToBottom();
           }
 
           this.addLog('info', `共收到 ${data.total_chunks || '未知数量'} 个数据块`);
@@ -237,6 +258,8 @@ Page({
             receivedData: this.data.receivedData + content,
             isReceivingDone: false
           });
+          // 接收流式数据时触发滚动
+          this.triggerScrollToBottom();
         }
       } catch (error) {
         const errorMsg = `错误类型：${error.name || '未知错误'}\n错误描述：${error.message}`;
@@ -258,6 +281,7 @@ Page({
       this.addLog('error', `WebSocket错误: ${err.errMsg}`);
       this.setData({ isConnected: false });
       this.stopHeartbeat();
+      this.tryReconnect();
     });
   },
 
@@ -348,6 +372,9 @@ Page({
       chatMessages: [...this.data.chatMessages, userMessage],
       receivedData: ''
     });
+
+    // 发送消息后滚动到底部
+    this.triggerScrollToBottom();
 
     this.data.socketTask.send({
       data: JSON.stringify(data),
@@ -478,6 +505,9 @@ Page({
       receivedData: ''
     });
 
+    // 发送消息后滚动到底部
+    this.triggerScrollToBottom();
+
     this.data.socketTask.send({
       data: JSON.stringify(data),
       success: () => {
@@ -514,6 +544,12 @@ Page({
         isConnected: false
       });
     }
+
+    // 清除重连定时器
+    if (this.data.reconnectTimer) {
+      clearTimeout(this.data.reconnectTimer);
+      this.setData({ reconnectTimer: null });
+    }
   },
 
   startHeartbeat() {
@@ -549,7 +585,24 @@ Page({
   },
 
   tryReconnect() {
-    this.addLog('error', '连接断开，请刷新页面重试');
+    if (this.data.reconnectCount >= this.data.maxReconnectCount) {
+      this.addLog('error', '重连次数已达上限，停止重连');
+      return;
+    }
+
+    this.setData({
+      reconnectCount: this.data.reconnectCount + 1
+    });
+
+    const delay = Math.min(1000 * Math.pow(2, this.data.reconnectCount), 30000);
+
+    this.addLog('info', `将在 ${delay / 1000} 秒后尝试重连 (${this.data.reconnectCount}/${this.data.maxReconnectCount})`);
+
+    this.setData({
+      reconnectTimer: setTimeout(() => {
+        this.connectWebSocket();
+      }, delay)
+    });
   },
 
   addLog(type, content) {
@@ -570,6 +623,49 @@ Page({
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const seconds = date.getSeconds().toString().padStart(2, '0');
     return `${hours}:${minutes}:${seconds}`;
+  },
+
+  // 滚动事件处理
+  onScroll(e) {
+    const scrollTop = e.detail.scrollTop;
+    const scrollHeight = e.detail.scrollHeight;
+    const viewHeight = e.detail.scrollHeight - scrollTop;
+
+    // 判断是否在底部
+    const isAtBottom = (scrollHeight - scrollTop - viewHeight) < this.data.scrollThreshold;
+
+    // 检测用户是否向上滚动（手动滚动）
+    if (scrollTop < this.data.lastScrollTop) {
+      this.setData({ isUserScrolling: true });
+    } else if (isAtBottom) {
+      // 如果滚动到底部，重置用户滚动标志
+      this.setData({ isUserScrolling: false });
+    }
+
+    // 更新悬浮按钮显示状态
+    this.setData({
+      showScrollToBottomBtn: !isAtBottom,
+      lastScrollTop: scrollTop
+    });
+  },
+
+  // 滚动到底部
+  scrollToBottom() {
+    this.setData({
+      scrollTop: 999999,
+      isUserScrolling: false,
+      showScrollToBottomBtn: false
+    });
+  },
+
+  // 触发滚动到底部（新消息到达时调用）
+  triggerScrollToBottom() {
+    if (!this.data.isUserScrolling) {
+      this.scrollToBottom();
+    } else {
+      // 如果用户正在滚动，显示悬浮按钮提示有新消息
+      this.setData({ showScrollToBottomBtn: true });
+    }
   },
 
   changeisexpanded() {
